@@ -13,8 +13,19 @@ const appData = {
         { id: 'INC-002', title: 'Slip and Fall in Hallway', status: 'Resolved', date: 'Mar 25, 2025', description: 'Student slipped on wet floor in main hallway.' },
         { id: 'INC-003', title: 'Electrical Outage', status: 'Critical', date: 'Mar 30, 2025', description: 'Power outage affecting east wing of building.' }
     ],
-    maintenanceRequests: [],
-    tasks: []
+    maintenanceRequests: [
+        { id: 'MNT-001', title: 'Broken Window', status: 'Pending', date: 'Mar 29, 2025', description: 'Window broken in classroom 101.' },
+        { id: 'MNT-002', title: 'AC Not Working', status: 'In Progress', date: 'Mar 27, 2025', description: 'Air conditioning unit not functioning in office area.' }
+    ],
+    documents: [
+        { id: 'DOC-001', title: 'Emergency Response Plan', type: 'PDF', date: 'Jan 15, 2025', uploadedBy: 'Administrator' },
+        { id: 'DOC-002', title: 'Chemical Safety Guidelines', type: 'DOCX', date: 'Feb 10, 2025', uploadedBy: 'Administrator' }
+    ],
+    settings: {
+        notificationsEnabled: true,
+        autoLogout: 30,
+        theme: 'light'
+    }
 };
 
 // Current user session
@@ -36,8 +47,11 @@ document.addEventListener('DOMContentLoaded', function() {
     // Add click handlers to all buttons
     setupButtons();
     
-    // Setup login form if on login page
-    setupLoginForm();
+    // Load data into UI
+    loadDataIntoUI();
+    
+    // Show admin controls if user is admin
+    updateUIForRole();
 });
 
 // Check if user is logged in
@@ -74,50 +88,19 @@ function updateUserInfo() {
     if (userInfoElement) {
         userInfoElement.textContent = currentUser.name;
     }
+}
+
+// Update UI based on user role
+function updateUIForRole() {
+    if (!currentUser) return;
     
     // Show admin controls if user is admin
     if (currentUser.role === 'admin') {
         const adminControls = document.querySelectorAll('.admin-only');
         adminControls.forEach(control => {
-            control.style.display = 'block';
+            control.style.display = 'inline-block';
         });
     }
-}
-
-// Set up login form
-function setupLoginForm() {
-    const loginForm = document.getElementById('loginForm');
-    if (!loginForm) return;
-    
-    loginForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const username = document.getElementById('username').value;
-        const password = document.getElementById('password').value;
-        
-        // Find user
-        const user = users.find(u => u.username === username && u.password === password);
-        
-        if (user) {
-            // Store user info (in a real app, this would be a session token)
-            currentUser = {
-                username: user.username,
-                role: user.role,
-                name: user.name
-            };
-            
-            localStorage.setItem('currentUser', JSON.stringify(currentUser));
-            
-            // Redirect to dashboard
-            window.location.href = '/dashboard.html';
-        } else {
-            // Show error message
-            const errorMessage = document.getElementById('errorMessage');
-            if (errorMessage) {
-                errorMessage.style.display = 'block';
-            }
-        }
-    });
 }
 
 // Set up navigation between pages
@@ -159,9 +142,6 @@ function setupForms() {
     
     // Add submit handler to each form
     forms.forEach(function(form) {
-        // Skip login form (handled separately)
-        if (form.id === 'loginForm') return;
-        
         form.addEventListener('submit', function(e) {
             // Prevent default form submission
             e.preventDefault();
@@ -171,6 +151,10 @@ function setupForms() {
                 handleIncidentSubmission(form);
             } else if (form.id === 'maintenanceForm') {
                 handleMaintenanceSubmission(form);
+            } else if (form.id === 'documentUploadForm') {
+                handleDocumentUpload(form);
+            } else if (form.id === 'settingsForm') {
+                handleSettingsUpdate(form);
             } else {
                 // Generic form handling
                 alert('Form submitted successfully! (This is a demo)');
@@ -264,21 +248,120 @@ function handleMaintenanceSubmission(form) {
     
     // Reset form
     form.reset();
+    
+    // Refresh maintenance list if visible
+    refreshMaintenanceList();
+}
+
+// Handle document upload
+function handleDocumentUpload(form) {
+    // Get form values
+    const title = form.querySelector('[name="documentTitle"]') ? 
+                 form.querySelector('[name="documentTitle"]').value : 'New Document';
+    
+    const fileInput = form.querySelector('[name="documentFile"]');
+    let fileType = 'Unknown';
+    
+    if (fileInput && fileInput.files.length > 0) {
+        const fileName = fileInput.files[0].name;
+        fileType = fileName.split('.').pop().toUpperCase();
+    }
+    
+    // Create new document
+    const newDocument = {
+        id: 'DOC-' + (appData.documents.length + 1).toString().padStart(3, '0'),
+        title: title,
+        type: fileType,
+        date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+        uploadedBy: currentUser ? currentUser.name : 'Anonymous'
+    };
+    
+    // Add to documents array
+    appData.documents.push(newDocument);
+    
+    // Save to localStorage (in a real app, this would be sent to a server)
+    localStorage.setItem('appData', JSON.stringify(appData));
+    
+    // Show success message
+    alert('Document uploaded successfully! Document ID: ' + newDocument.id);
+    
+    // Reset form
+    form.reset();
+    
+    // Refresh documents list if visible
+    refreshDocumentsList();
+}
+
+// Handle settings update
+function handleSettingsUpdate(form) {
+    // Get form values
+    const notificationsEnabled = form.querySelector('[name="notificationsEnabled"]') ? 
+                               form.querySelector('[name="notificationsEnabled"]').checked : true;
+    
+    const autoLogout = form.querySelector('[name="autoLogout"]') ?
+                      parseInt(form.querySelector('[name="autoLogout"]').value) : 30;
+    
+    const theme = form.querySelector('[name="theme"]') ?
+                 form.querySelector('[name="theme"]').value : 'light';
+    
+    // Update settings
+    appData.settings = {
+        notificationsEnabled: notificationsEnabled,
+        autoLogout: autoLogout,
+        theme: theme
+    };
+    
+    // Save to localStorage (in a real app, this would be sent to a server)
+    localStorage.setItem('appData', JSON.stringify(appData));
+    
+    // Show success message
+    alert('Settings updated successfully!');
+    
+    // Apply theme if changed
+    applyTheme(theme);
+}
+
+// Apply theme
+function applyTheme(theme) {
+    document.body.className = theme === 'dark' ? 'dark-theme' : '';
+}
+
+// Load data into UI
+function loadDataIntoUI() {
+    // Load saved data from localStorage
+    const savedData = localStorage.getItem('appData');
+    if (savedData) {
+        try {
+            const parsedData = JSON.parse(savedData);
+            // Merge saved data with default data
+            appData.incidents = parsedData.incidents || appData.incidents;
+            appData.maintenanceRequests = parsedData.maintenanceRequests || appData.maintenanceRequests;
+            appData.documents = parsedData.documents || appData.documents;
+            appData.settings = parsedData.settings || appData.settings;
+        } catch (e) {
+            console.error('Error loading saved data:', e);
+        }
+    }
+    
+    // Refresh all lists
+    refreshIncidentsList();
+    refreshMaintenanceList();
+    refreshDocumentsList();
+    
+    // Load settings
+    loadSettings();
 }
 
 // Refresh the incidents list in the UI
 function refreshIncidentsList() {
-    const incidentsTable = document.querySelector('#dashboard table tbody');
+    const incidentsTable = document.querySelector('#incidents table tbody');
     if (!incidentsTable) return;
     
     // Clear existing rows
     incidentsTable.innerHTML = '';
     
-    // Get the most recent 3 incidents
-    const recentIncidents = [...appData.incidents].reverse().slice(0, 3);
-    
     // Add rows for each incident
-    recentIncidents.forEach(incident => {
+    appData.incidents.forEach(incident => {
         const row = document.createElement('tr');
         
         // Create status class
@@ -291,11 +374,150 @@ function refreshIncidentsList() {
             <td>${incident.title}</td>
             <td><span class="status ${statusClass}">${incident.status}</span></td>
             <td>${incident.date}</td>
-            <td><button class="view-btn" data-action="view-details" data-id="${incident.id}">View</button></td>
+            <td>
+                <button class="view-btn" data-action="view-details" data-id="${incident.id}">View</button>
+                <button class="edit-btn admin-only" data-action="edit-item" data-id="${incident.id}" style="display: none;">Edit</button>
+                <button class="delete-btn admin-only" data-action="delete-item" data-id="${incident.id}" style="display: none;">Delete</button>
+            </td>
         `;
         
         incidentsTable.appendChild(row);
     });
+    
+    // Update dashboard summary if exists
+    updateDashboardSummary();
+}
+
+// Refresh the maintenance requests list in the UI
+function refreshMaintenanceList() {
+    const maintenanceTable = document.querySelector('#maintenance table tbody');
+    if (!maintenanceTable) return;
+    
+    // Clear existing rows
+    maintenanceTable.innerHTML = '';
+    
+    // Add rows for each maintenance request
+    appData.maintenanceRequests.forEach(request => {
+        const row = document.createElement('tr');
+        
+        // Create status class
+        let statusClass = 'pending';
+        if (request.status === 'In Progress') statusClass = 'in-progress';
+        if (request.status === 'Completed') statusClass = 'resolved';
+        
+        row.innerHTML = `
+            <td>${request.id}</td>
+            <td>${request.title}</td>
+            <td><span class="status ${statusClass}">${request.status}</span></td>
+            <td>${request.date}</td>
+            <td>
+                <button class="view-btn" data-action="view-details" data-id="${request.id}">View</button>
+                <button class="edit-btn admin-only" data-action="edit-item" data-id="${request.id}" style="display: none;">Edit</button>
+                <button class="delete-btn admin-only" data-action="delete-item" data-id="${request.id}" style="display: none;">Delete</button>
+            </td>
+        `;
+        
+        maintenanceTable.appendChild(row);
+    });
+    
+    // Update dashboard summary if exists
+    updateDashboardSummary();
+}
+
+// Refresh the documents list in the UI
+function refreshDocumentsList() {
+    const documentsTable = document.querySelector('#documents table tbody');
+    if (!documentsTable) return;
+    
+    // Clear existing rows
+    documentsTable.innerHTML = '';
+    
+    // Add rows for each document
+    appData.documents.forEach(document => {
+        const row = document.createElement('tr');
+        
+        row.innerHTML = `
+            <td>${document.id}</td>
+            <td>${document.title}</td>
+            <td>${document.type}</td>
+            <td>${document.date}</td>
+            <td>
+                <button class="view-btn" data-action="view-details" data-id="${document.id}">View</button>
+                <button class="delete-btn admin-only" data-action="delete-item" data-id="${document.id}" style="display: none;">Delete</button>
+            </td>
+        `;
+        
+        documentsTable.appendChild(row);
+    });
+}
+
+// Load settings into UI
+function loadSettings() {
+    const settingsForm = document.getElementById('settingsForm');
+    if (!settingsForm) return;
+    
+    const notificationsCheckbox = settingsForm.querySelector('[name="notificationsEnabled"]');
+    if (notificationsCheckbox) {
+        notificationsCheckbox.checked = appData.settings.notificationsEnabled;
+    }
+    
+    const autoLogoutSelect = settingsForm.querySelector('[name="autoLogout"]');
+    if (autoLogoutSelect) {
+        autoLogoutSelect.value = appData.settings.autoLogout;
+    }
+    
+    const themeSelect = settingsForm.querySelector('[name="theme"]');
+    if (themeSelect) {
+        themeSelect.value = appData.settings.theme;
+    }
+    
+    // Apply current theme
+    applyTheme(appData.settings.theme);
+}
+
+// Update dashboard summary
+function updateDashboardSummary() {
+    // Update open incidents count
+    const openIncidentsCount = document.getElementById('openIncidentsCount');
+    if (openIncidentsCount) {
+        openIncidentsCount.textContent = appData.incidents.length;
+    }
+    
+    // Update maintenance requests count
+    const maintenanceRequestsCount = document.getElementById('maintenanceRequestsCount');
+    if (maintenanceRequestsCount) {
+        maintenanceRequestsCount.textContent = appData.maintenanceRequests.length;
+    }
+    
+    // Update recent incidents table
+    const recentIncidentsTable = document.querySelector('#dashboard table tbody');
+    if (recentIncidentsTable) {
+        // Clear existing rows
+        recentIncidentsTable.innerHTML = '';
+        
+        // Get the most recent 3 incidents
+        const recentIncidents = [...appData.incidents].reverse().slice(0, 3);
+        
+        // Add rows for each incident
+        recentIncidents.forEach(incident => {
+            const row = document.createElement('tr');
+            
+            // Create status class
+            let statusClass = 'in-progress';
+            if (incident.status === 'Resolved') statusClass = 'resolved';
+            if (incident.status === 'Critical') statusClass = 'critical';
+            
+            row.innerHTML = `
+                <td>${incident.id}</td>
+                <td>${incident.title}</td>
+                <td><span class="status ${statusClass}">${incident.status}</span></td>
+                <td>${incident.date}</td>
+                <td><button class="view-btn" data-action="view-details" data-id="${incident.id}">View</button></td>
+            `;
+            
+            recentIncidentsTable.appendChild(row);
+        });
+    }
 }
 
 // Set up button click handlers
@@ -348,18 +570,6 @@ function navigateTo(sectionId) {
 // Handle button actions
 function handleButtonAction(action, button) {
     switch(action) {
-        case 'login':
-            // Handled by form submission
-            break;
-            
-        case 'logout':
-            logout();
-            break;
-            
-        case 'report-incident':
-            // Handled by form submission
-            break;
-            
         case 'view-details':
             const id = button.getAttribute('data-id');
             viewItemDetails(id);
@@ -389,16 +599,20 @@ function viewItemDetails(id) {
         item = appData.incidents.find(inc => inc.id === id);
     } else if (id.startsWith('MNT-')) {
         item = appData.maintenanceRequests.find(req => req.id === id);
+    } else if (id.startsWith('DOC-')) {
+        item = appData.documents.find(doc => doc.id === id);
     }
     
     if (item) {
         // In a real app, this would open a modal or navigate to a details page
         let details = `
-            ID: ${item.id}
-            Title: ${item.title}
-            Status: ${item.status}
-            Date: ${item.date}
-            ${item.description ? 'Description: ' + item.description : ''}
+ID: ${item.id}
+Title: ${item.title}
+Status: ${item.status || 'N/A'}
+Date: ${item.date}
+${item.description ? 'Description: ' + item.description : ''}
+${item.type ? 'Type: ' + item.type : ''}
+${item.uploadedBy ? 'Uploaded By: ' + item.uploadedBy : ''}
         `;
         
         alert(details);
@@ -424,6 +638,9 @@ function editItem(id) {
     } else if (id.startsWith('MNT-')) {
         item = appData.maintenanceRequests.find(req => req.id === id);
         itemType = 'maintenance request';
+    } else if (id.startsWith('DOC-')) {
+        item = appData.documents.find(doc => doc.id === id);
+        itemType = 'document';
     }
     
     if (item) {
@@ -432,6 +649,15 @@ function editItem(id) {
         if (newTitle && newTitle.trim() !== '') {
             item.title = newTitle;
             
+            // If it's an incident or maintenance request, also edit status
+            if (id.startsWith('INC-') || id.startsWith('MNT-')) {
+                const statusOptions = ['New', 'In Progress', 'Resolved', 'Critical', 'Pending', 'Completed'];
+                const newStatus = prompt('Edit status (' + statusOptions.join(', ') + '):', item.status);
+                if (newStatus && statusOptions.includes(newStatus)) {
+                    item.status = newStatus;
+                }
+            }
+            
             // Save changes
             localStorage.setItem('appData', JSON.stringify(appData));
             
@@ -439,6 +665,8 @@ function editItem(id) {
             
             // Refresh UI
             refreshIncidentsList();
+            refreshMaintenanceList();
+            refreshDocumentsList();
         }
     } else {
         alert('Item not found');
@@ -465,6 +693,10 @@ function deleteItem(id) {
         itemIndex = appData.maintenanceRequests.findIndex(req => req.id === id);
         itemArray = appData.maintenanceRequests;
         itemType = 'maintenance request';
+    } else if (id.startsWith('DOC-')) {
+        itemIndex = appData.documents.findIndex(doc => doc.id === id);
+        itemArray = appData.documents;
+        itemType = 'document';
     }
     
     if (itemIndex !== -1) {
@@ -479,6 +711,9 @@ function deleteItem(id) {
             
             // Refresh UI
             refreshIncidentsList();
+            refreshMaintenanceList();
+            refreshDocumentsList();
+            updateDashboardSummary();
         }
     } else {
         alert('Item not found');
@@ -494,19 +729,3 @@ function logout() {
     // Redirect to login page
     window.location.href = '/login.html';
 }
-
-// Load saved data on startup
-(function loadSavedData() {
-    const savedData = localStorage.getItem('appData');
-    if (savedData) {
-        try {
-            const parsedData = JSON.parse(savedData);
-            // Merge saved data with default data
-            appData.incidents = parsedData.incidents || appData.incidents;
-            appData.maintenanceRequests = parsedData.maintenanceRequests || appData.maintenanceRequests;
-            appData.tasks = parsedData.tasks || appData.tasks;
-        } catch (e) {
-            console.error('Error loading saved data:', e);
-        }
-    }
-})();
