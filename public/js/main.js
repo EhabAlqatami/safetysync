@@ -132,14 +132,22 @@ function navigateTo(page) {
 }
 
 function showAuthenticatedUI(user) {
-    document.getElementById('loginSection').style.display = 'none';
-    document.getElementById('dashboardSection').style.display = 'block';
-    
-    // Update user info display
-    const userInfoElement = document.getElementById('userInfo');
-    if (userInfoElement) {
-        userInfoElement.textContent = `Welcome, ${user.name}`;
-    }
+  const loginSection = document.getElementById('loginSection');
+  const dashboardSection = document.getElementById('dashboardSection');
+  
+  if (loginSection) {
+    loginSection.style.display = 'none';
+  }
+  
+  if (dashboardSection) {
+    dashboardSection.style.display = 'block';
+  }
+  
+  // Update user info display
+  const userInfoElement = document.getElementById('userInfo');
+  if (userInfoElement) {
+    userInfoElement.textContent = `Welcome, ${user.name}`;
+  }
 }
 
 function showLoginUI() {
