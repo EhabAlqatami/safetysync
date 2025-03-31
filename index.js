@@ -15,3 +15,7 @@ app.get('/', (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+// Add this fallback route
+app.get('*', (req, res) => {
+  res.send('Welcome to SafetySync EHS App! Site is under construction.');
+});
