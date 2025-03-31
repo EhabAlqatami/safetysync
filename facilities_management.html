@@ -1,0 +1,1663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EHS App - Facilities Management</title>
+    <style>
+        :root {
+            --primary-green: #2E8B57;
+            --light-green: #8FBC8F;
+            --dark-green: #006400;
+            --white: #FFFFFF;
+            --light-gray: #F5F5F5;
+            --dark-gray: #333333;
+            --warning-yellow: #FFD700;
+            --danger-red: #DC3545;
+            --info-blue: #17A2B8;
+        }
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--light-gray);
+            color: var(--dark-gray);
+        }
+        
+        .layout {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        .sidebar {
+            width: 250px;
+            background-color: var(--dark-green);
+            color: var(--white);
+            padding: 0;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+        }
+        
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--primary-green);
+        }
+        
+        .sidebar-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .sidebar-menu li {
+            padding: 0;
+        }
+        
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            color: var(--white);
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+        
+        .sidebar-menu a:hover, .sidebar-menu a.active {
+            background-color: var(--primary-green);
+        }
+        
+        .sidebar-menu .icon {
+            margin-right: 10px;
+            width: 20px;
+            height: 20px;
+            background-color: var(--white);
+            border-radius: 50%;
+        }
+        
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            margin-top: 60px;
+        }
+        
+        .topbar {
+            position: fixed;
+            top: 0;
+            right: 0;
+            left: 250px;
+            height: 60px;
+            background-color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            z-index: 100;
+        }
+        
+        .topbar-left {
+            display: flex;
+            align-items: center;
+        }
+        
+        .topbar-right {
+            display: flex;
+            align-items: center;
+        }
+        
+        .notification-icon {
+            margin-right: 20px;
+            position: relative;
+        }
+        
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            width: 10px;
+            height: 10px;
+            background-color: var(--danger-red);
+            border-radius: 50%;
+        }
+        
+        .user-profile {
+            display: flex;
+            align-items: center;
+        }
+        
+        .avatar {
+            width: 32px;
+            height: 32px;
+            background-color: var(--primary-green);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        
+        .user-info {
+            line-height: 1.2;
+        }
+        
+        .user-name {
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        
+        .user-role {
+            font-size: 0.8rem;
+            color: #666;
+        }
+        
+        .page-header {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .page-title {
+            margin: 0;
+            color: var(--dark-green);
+            font-size: 1.8rem;
+        }
+        
+        .page-subtitle {
+            margin: 5px 0 0;
+            color: #666;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: var(--primary-green);
+            color: var(--white);
+            border: none;
+            border-radius: 4px;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+        
+        .btn:hover {
+            background-color: var(--dark-green);
+        }
+        
+        .btn-secondary {
+            background-color: var(--white);
+            color: var(--primary-green);
+            border: 1px solid var(--primary-green);
+        }
+        
+        .btn-secondary:hover {
+            background-color: var(--light-green);
+            color: var(--dark-green);
+        }
+        
+        .card {
+            background-color: var(--white);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .card-header {
+            background-color: var(--primary-green);
+            color: var(--white);
+            padding: 15px 20px;
+            font-weight: bold;
+        }
+        
+        .card-body {
+            padding: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        
+        .form-select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            background-color: var(--white);
+        }
+        
+        .form-textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .form-row {
+            display: flex;
+            margin-left: -10px;
+            margin-right: -10px;
+        }
+        
+        .form-col {
+            flex: 1;
+            padding-left: 10px;
+            padding-right: 10px;
+        }
+        
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            font-weight: 500;
+        }
+        
+        .tab.active {
+            border-bottom-color: var(--primary-green);
+            color: var(--primary-green);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .badge-success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .badge-warning {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        
+        .badge-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        .badge-info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+        }
+        
+        .badge-secondary {
+            background-color: #e2e3e5;
+            color: #383d41;
+        }
+        
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background-color: var(--white);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary-green);
+            margin: 10px 0;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .service-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .service-item {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .service-item:last-child {
+            border-bottom: none;
+        }
+        
+        .service-item:hover {
+            background-color: #f9f9f9;
+        }
+        
+        .service-info {
+            flex: 1;
+        }
+        
+        .service-title {
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+        
+        .service-details {
+            display: flex;
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .service-detail {
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .service-detail-icon {
+            margin-right: 5px;
+        }
+        
+        .service-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .service-action-btn {
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+        
+        .calendar-container {
+            margin-bottom: 20px;
+        }
+        
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .calendar-title {
+            font-size: 1.2rem;
+            font-weight: 500;
+        }
+        
+        .calendar-nav {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .calendar-nav-btn {
+            padding: 5px 10px;
+            border-radius: 4px;
+            background-color: var(--white);
+            border: 1px solid #ddd;
+            cursor: pointer;
+        }
+        
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+        }
+        
+        .calendar-day-header {
+            text-align: center;
+            font-weight: 500;
+            padding: 10px;
+            background-color: var(--light-green);
+            color: var(--dark-green);
+            border-radius: 4px;
+        }
+        
+        .calendar-day {
+            min-height: 100px;
+            background-color: var(--white);
+            border-radius: 4px;
+            padding: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .calendar-date {
+            text-align: right;
+            font-weight: 500;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .calendar-event {
+            font-size: 0.9rem;
+            padding: 5px;
+            margin-bottom: 5px;
+            border-radius: 4px;
+            background-color: #f8f9fa;
+        }
+        
+        .calendar-event.pest-control {
+            background-color: #d1ecf1;
+            border-left: 3px solid #17a2b8;
+        }
+        
+        .calendar-event.elevator {
+            background-color: #d4edda;
+            border-left: 3px solid #28a745;
+        }
+        
+        .calendar-event.ac {
+            background-color: #fff3cd;
+            border-left: 3px solid #ffc107;
+        }
+        
+        .calendar-event.landscaping {
+            background-color: #e2e3e5;
+            border-left: 3px solid #6c757d;
+        }
+        
+        .calendar-event.water {
+            background-color: #cce5ff;
+            border-left: 3px solid #007bff;
+        }
+        
+        .calendar-event.air {
+            background-color: #f8d7da;
+            border-left: 3px solid #dc3545;
+        }
+        
+        .maintenance-request-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .maintenance-request-item {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .maintenance-request-item:last-child {
+            border-bottom: none;
+        }
+        
+        .maintenance-request-item:hover {
+            background-color: #f9f9f9;
+        }
+        
+        .maintenance-request-info {
+            flex: 1;
+        }
+        
+        .maintenance-request-title {
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+        
+        .maintenance-request-details {
+            display: flex;
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .maintenance-request-detail {
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .maintenance-request-detail-icon {
+            margin-right: 5px;
+        }
+        
+        .maintenance-request-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .maintenance-request-action-btn {
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+        
+        /* Mobile styles */
+        @media (max-width: 768px) {
+            .layout {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                height: 60px;
+                z-index: 100;
+            }
+            
+            .sidebar-header {
+                display: none;
+            }
+            
+            .sidebar-menu {
+                display: flex;
+                height: 100%;
+            }
+            
+            .sidebar-menu li {
+                flex: 1;
+            }
+            
+            .sidebar-menu a {
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                padding: 5px;
+                height: 100%;
+                font-size: 0.8rem;
+            }
+            
+            .sidebar-menu .icon {
+                margin-right: 0;
+                margin-bottom: 5px;
+            }
+            
+            .topbar {
+                left: 0;
+            }
+            
+            .main-content {
+                margin-bottom: 60px;
+                margin-top: 60px;
+                padding: 15px;
+            }
+            
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .page-header > div:last-child {
+                margin-top: 10px;
+                width: 100%;
+                display: flex;
+                gap: 10px;
+            }
+            
+            .page-header .btn {
+                flex: 1;
+                text-align: center;
+            }
+            
+            .form-row {
+                flex-direction: column;
+            }
+            
+            .form-col {
+                padding: 0;
+            }
+            
+            .stats-container {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .calendar-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .calendar-day-header {
+                display: none;
+            }
+            
+            .calendar-day {
+                display: flex;
+                flex-direction: column;
+            }
+            
+            .calendar-date {
+                text-align: left;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+            
+            .calendar-date::after {
+                content: attr(data-day);
+                font-size: 0.8rem;
+                color: #666;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="layout">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2>EHS App</h2>
+            </div>
+            <ul class="sidebar-menu">
+                <li><a href="#">
+                    <span class="icon">📊</span>
+                    Dashboard
+                </a></li>
+                <li><a href="#">
+                    <span class="icon">⚠️</span>
+                    Incidents
+                </a></li>
+                <li><a href="#" class="active">
+                    <span class="icon">🔧</span>
+                    Facilities
+                </a></li>
+                <li><a href="#">
+                    <span class="icon">📋</span>
+                    Audits
+                </a></li>
+                <li><a href="#">
+                    <span class="icon">🧹</span>
+                    Housekeeping
+                </a></li>
+                <li><a href="#">
+                    <span class="icon">⚙️</span>
+                    Settings
+                </a></li>
+            </ul>
+        </div>
+        
+        <div class="main-content">
+            <div class="topbar">
+                <div class="topbar-left">
+                    <h1 style="margin: 0; color: var(--primary-green);">EHS App</h1>
+                </div>
+                <div class="topbar-right">
+                    <div class="notification-icon">
+                        <span>🔔</span>
+                        <span class="notification-badge"></span>
+                    </div>
+                    <div class="user-profile">
+                        <div class="avatar">US</div>
+                        <div class="user-info">
+                            <div class="user-name">User Name</div>
+                            <div class="user-role">Facilities Manager</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title">Facilities Management</h1>
+                    <p class="page-subtitle">Manage maintenance, services, and facility operations</p>
+                </div>
+                <div>
+                    <a href="#" class="btn btn-secondary">View Calendar</a>
+                    <a href="#" class="btn">Create Request</a>
+                </div>
+            </div>
+            
+            <div class="tabs">
+                <div class="tab active">Dashboard</div>
+                <div class="tab">Maintenance</div>
+                <div class="tab">Services</div>
+                <div class="tab">Departments</div>
+            </div>
+            
+            <div class="tab-content active">
+                <div class="stats-container">
+                    <div class="stat-card">
+                        <div class="stat-label">Maintenance Requests</div>
+                        <div class="stat-value">24</div>
+                        <div>8 pending approval</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Scheduled Services</div>
+                        <div class="stat-value">12</div>
+                        <div>Next 30 days</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Completed Tasks</div>
+                        <div class="stat-value">37</div>
+                        <div>This month</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Departments</div>
+                        <div class="stat-value">6</div>
+                        <div>Active departments</div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        Upcoming Services
+                    </div>
+                    <div class="card-body">
+                        <ul class="service-list">
+                            <li class="service-item">
+                                <div class="service-info">
+                                    <div class="service-title">Pest Control Service</div>
+                                    <div class="service-details">
+                                        <div class="service-detail">
+                                            <span class="service-detail-icon">🕒</span>
+                                            <span>Apr 18, 2025</span>
+                                        </div>
+                                        <div class="service-detail">
+                                            <span class="service-detail-icon">📍</span>
+                                            <span>All Buildings</span>
+                                        </div>
+                                        <div class="service-detail">
+                                            <span class="badge badge-info">Scheduled</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="service-actions">
+                                    <button class="service-action-btn btn-secondary">Details</button>
+                                    <button class="service-action-btn btn">Reschedule</button>
+                                </div>
+                            </li>
+                            <li class="service-item">
+                                <div class="service-info">
+                                    <div class="service-title">Elevator Preventive Maintenance</div>
+                                    <div class="service-details">
+                                        <div class="service-detail">
+                                            <span class="service-detail-icon">🕒</span>
+                                            <span>Apr 22, 2025</span>
+                                        </div>
+                                        <div class="service-detail">
+                                            <span class="service-detail-icon">📍</span>
+                                            <span>Main Building</span>
+                                        </div>
+                                        <div class="service-detail">
+                                            <span class="badge badge-info">Scheduled</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="service-actions">
+                                    <button class="service-action-btn btn-secondary">Details</button>
+                                    <button class="service-action-btn btn">Reschedule</button>
+                                </div>
+                            </li>
+                            <li class="service-item">
+                                <div class="service-info">
+                                    <div class="service-title">AC System PPM</div>
+                                    <div class="service-details">
+                                        <div class="service-detail">
+                                            <span class="service-detail-icon">🕒</span>
+                                            <span>Apr 25, 2025</span>
+                                        </div>
+                                        <div class="service-detail">
+                                            <span class="service-detail-icon">📍</span>
+                                            <span>All Buildings</span>
+                                        </div>
+                                        <div class="service-detail">
+                                            <span class="badge badge-info">Scheduled</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="service-actions">
+                                    <button class="service-action-btn btn-secondary">Details</button>
+                                    <button class="service-action-btn btn">Reschedule</button>
+                                </div>
+                            </li>
+                            <li class="service-item">
+                                <div class="service-info">
+                                    <div class="service-title">Water Tank Cleaning</div>
+                                    <div class="service-details">
+                                        <div class="service-detail">
+                                            <span class="service-detail-icon">🕒</span>
+                                            <span>May 5, 2025</span>
+                                        </div>
+                                        <div class="service-detail">
+                                            <span class="service-detail-icon">📍</span>
+                                            <span>All Buildings</span>
+                                        </div>
+                                        <div class="service-detail">
+                                            <span class="badge badge-secondary">Pending Approval</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="service-actions">
+                                    <button class="service-action-btn btn-secondary">Details</button>
+                                    <button class="service-action-btn btn">Approve</button>
+                                </div>
+                            </li>
+                            <li class="service-item">
+                                <div class="service-info">
+                                    <div class="service-title">Air Quality Testing</div>
+                                    <div class="service-details">
+                                        <div class="service-detail">
+                                            <span class="service-detail-icon">🕒</span>
+                                            <span>May 12, 2025</span>
+                                        </div>
+                                        <div class="service-detail">
+                                            <span class="service-detail-icon">📍</span>
+                                            <span>All Buildings</span>
+                                        </div>
+                                        <div class="service-detail">
+                                            <span class="badge badge-secondary">Pending Approval</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="service-actions">
+                                    <button class="service-action-btn btn-secondary">Details</button>
+                                    <button class="service-action-btn btn">Approve</button>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        Recent Maintenance Requests
+                    </div>
+                    <div class="card-body">
+                        <ul class="maintenance-request-list">
+                            <li class="maintenance-request-item">
+                                <div class="maintenance-request-info">
+                                    <div class="maintenance-request-title">Broken AC in Classroom 203</div>
+                                    <div class="maintenance-request-details">
+                                        <div class="maintenance-request-detail">
+                                            <span class="maintenance-request-detail-icon">👤</span>
+                                            <span>Sarah Johnson</span>
+                                        </div>
+                                        <div class="maintenance-request-detail">
+                                            <span class="maintenance-request-detail-icon">🕒</span>
+                                            <span>Apr 14, 2025</span>
+                                        </div>
+                                        <div class="maintenance-request-detail">
+                                            <span class="badge badge-warning">In Progress</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="maintenance-request-actions">
+                                    <button class="maintenance-request-action-btn btn-secondary">View</button>
+                                    <button class="maintenance-request-action-btn btn">Complete</button>
+                                </div>
+                            </li>
+                            <li class="maintenance-request-item">
+                                <div class="maintenance-request-info">
+                                    <div class="maintenance-request-title">Leaking faucet in Staff Restroom</div>
+                                    <div class="maintenance-request-details">
+                                        <div class="maintenance-request-detail">
+                                            <span class="maintenance-request-detail-icon">👤</span>
+                                            <span>Ahmed Hassan</span>
+                                        </div>
+                                        <div class="maintenance-request-detail">
+                                            <span class="maintenance-request-detail-icon">🕒</span>
+                                            <span>Apr 13, 2025</span>
+                                        </div>
+                                        <div class="maintenance-request-detail">
+                                            <span class="badge badge-success">Completed</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="maintenance-request-actions">
+                                    <button class="maintenance-request-action-btn btn-secondary">View</button>
+                                </div>
+                            </li>
+                            <li class="maintenance-request-item">
+                                <div class="maintenance-request-info">
+                                    <div class="maintenance-request-title">Flickering lights in Hallway B</div>
+                                    <div class="maintenance-request-details">
+                                        <div class="maintenance-request-detail">
+                                            <span class="maintenance-request-detail-icon">👤</span>
+                                            <span>Fatima Al Zaabi</span>
+                                        </div>
+                                        <div class="maintenance-request-detail">
+                                            <span class="maintenance-request-detail-icon">🕒</span>
+                                            <span>Apr 12, 2025</span>
+                                        </div>
+                                        <div class="maintenance-request-detail">
+                                            <span class="badge badge-secondary">Pending</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="maintenance-request-actions">
+                                    <button class="maintenance-request-action-btn btn-secondary">View</button>
+                                    <button class="maintenance-request-action-btn btn">Assign</button>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        Maintenance Requests
+                    </div>
+                    <div class="card-body">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+                            <div>
+                                <input type="text" class="form-control" placeholder="Search requests..." style="width: 300px;">
+                            </div>
+                            <div>
+                                <select class="form-select" style="width: 150px;">
+                                    <option>All Status</option>
+                                    <option>Pending</option>
+                                    <option>In Progress</option>
+                                    <option>Completed</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <ul class="maintenance-request-list">
+                            <li class="maintenance-request-item">
+                                <div class="maintenance-request-info">
+                                    <div class="maintenance-request-title">Broken AC in Classroom 203</div>
+                                    <div class="maintenance-request-details">
+                                        <div class="maintenance-request-detail">
+                                            <span class="maintenance-request-detail-icon">👤</span>
+                                            <span>Sarah Johnson</span>
+                                        </div>
+                                        <div class="maintenance-request-detail">
+                                            <span class="maintenance-request-detail-icon">🕒</span>
+                                            <span>Apr 14, 2025</span>
+                                        </div>
+                                        <div class="maintenance-request-detail">
+                                            <span class="badge badge-warning">In Progress</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="maintenance-request-actions">
+                                    <button class="maintenance-request-action-btn btn-secondary">View</button>
+                                    <button class="maintenance-request-action-btn btn">Complete</button>
+                                </div>
+                            </li>
+                            <li class="maintenance-request-item">
+                                <div class="maintenance-request-info">
+                                    <div class="maintenance-request-title">Leaking faucet in Staff Restroom</div>
+                                    <div class="maintenance-request-details">
+                                        <div class="maintenance-request-detail">
+                                            <span class="maintenance-request-detail-icon">👤</span>
+                                            <span>Ahmed Hassan</span>
+                                        </div>
+                                        <div class="maintenance-request-detail">
+                                            <span class="maintenance-request-detail-icon">🕒</span>
+                                            <span>Apr 13, 2025</span>
+                                        </div>
+                                        <div class="maintenance-request-detail">
+                                            <span class="badge badge-success">Completed</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="maintenance-request-actions">
+                                    <button class="maintenance-request-action-btn btn-secondary">View</button>
+                                </div>
+                            </li>
+                            <li class="maintenance-request-item">
+                                <div class="maintenance-request-info">
+                                    <div class="maintenance-request-title">Flickering lights in Hallway B</div>
+                                    <div class="maintenance-request-details">
+                                        <div class="maintenance-request-detail">
+                                            <span class="maintenance-request-detail-icon">👤</span>
+                                            <span>Fatima Al Zaabi</span>
+                                        </div>
+                                        <div class="maintenance-request-detail">
+                                            <span class="maintenance-request-detail-icon">🕒</span>
+                                            <span>Apr 12, 2025</span>
+                                        </div>
+                                        <div class="maintenance-request-detail">
+                                            <span class="badge badge-secondary">Pending</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="maintenance-request-actions">
+                                    <button class="maintenance-request-action-btn btn-secondary">View</button>
+                                    <button class="maintenance-request-action-btn btn">Assign</button>
+                                </div>
+                            </li>
+                            <li class="maintenance-request-item">
+                                <div class="maintenance-request-info">
+                                    <div class="maintenance-request-title">Damaged floor tiles in Gym</div>
+                                    <div class="maintenance-request-details">
+                                        <div class="maintenance-request-detail">
+                                            <span class="maintenance-request-detail-icon">👤</span>
+                                            <span>Mohammed Al Mansouri</span>
+                                        </div>
+                                        <div class="maintenance-request-detail">
+                                            <span class="maintenance-request-detail-icon">🕒</span>
+                                            <span>Apr 10, 2025</span>
+                                        </div>
+                                        <div class="maintenance-request-detail">
+                                            <span class="badge badge-warning">In Progress</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="maintenance-request-actions">
+                                    <button class="maintenance-request-action-btn btn-secondary">View</button>
+                                    <button class="maintenance-request-action-btn btn">Complete</button>
+                                </div>
+                            </li>
+                            <li class="maintenance-request-item">
+                                <div class="maintenance-request-info">
+                                    <div class="maintenance-request-title">Broken window in Science Lab</div>
+                                    <div class="maintenance-request-details">
+                                        <div class="maintenance-request-detail">
+                                            <span class="maintenance-request-detail-icon">👤</span>
+                                            <span>John Smith</span>
+                                        </div>
+                                        <div class="maintenance-request-detail">
+                                            <span class="maintenance-request-detail-icon">🕒</span>
+                                            <span>Apr 9, 2025</span>
+                                        </div>
+                                        <div class="maintenance-request-detail">
+                                            <span class="badge badge-success">Completed</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="maintenance-request-actions">
+                                    <button class="maintenance-request-action-btn btn-secondary">View</button>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        Create Maintenance Request
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label class="form-label">Request Title</label>
+                            <input type="text" class="form-control" placeholder="Enter a descriptive title">
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-col">
+                                <div class="form-group">
+                                    <label class="form-label">Location</label>
+                                    <select class="form-select">
+                                        <option>Select location</option>
+                                        <option>Building A</option>
+                                        <option>Building B</option>
+                                        <option>Gymnasium</option>
+                                        <option>Cafeteria</option>
+                                        <option>Outdoor Areas</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-col">
+                                <div class="form-group">
+                                    <label class="form-label">Priority</label>
+                                    <select class="form-select">
+                                        <option>Select priority</option>
+                                        <option>Low</option>
+                                        <option>Medium</option>
+                                        <option>High</option>
+                                        <option>Emergency</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Description</label>
+                            <textarea class="form-textarea" placeholder="Describe the issue in detail"></textarea>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-col">
+                                <div class="form-group">
+                                    <label class="form-label">Requested By</label>
+                                    <input type="text" class="form-control" placeholder="Enter name">
+                                </div>
+                            </div>
+                            <div class="form-col">
+                                <div class="form-group">
+                                    <label class="form-label">Department</label>
+                                    <select class="form-select">
+                                        <option>Select department</option>
+                                        <option>Administration</option>
+                                        <option>Teaching Staff</option>
+                                        <option>Facilities</option>
+                                        <option>Security</option>
+                                        <option>Housekeeping</option>
+                                        <option>Canteen</option>
+                                        <option>Clinic</option>
+                                        <option>Transportation</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button class="btn btn-secondary">Cancel</button>
+                            <button class="btn">Submit Request</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        Service Schedule Calendar
+                    </div>
+                    <div class="card-body">
+                        <div class="calendar-container">
+                            <div class="calendar-header">
+                                <div class="calendar-title">April 2025</div>
+                                <div class="calendar-nav">
+                                    <button class="calendar-nav-btn">Previous</button>
+                                    <button class="calendar-nav-btn">Today</button>
+                                    <button class="calendar-nav-btn">Next</button>
+                                </div>
+                            </div>
+                            
+                            <div class="calendar-grid">
+                                <div class="calendar-day-header">Sunday</div>
+                                <div class="calendar-day-header">Monday</div>
+                                <div class="calendar-day-header">Tuesday</div>
+                                <div class="calendar-day-header">Wednesday</div>
+                                <div class="calendar-day-header">Thursday</div>
+                                <div class="calendar-day-header">Friday</div>
+                                <div class="calendar-day-header">Saturday</div>
+                                
+                                <div class="calendar-day">
+                                    <div class="calendar-date" data-day="Sun">1</div>
+                                </div>
+                                <div class="calendar-day">
+                                    <div class="calendar-date" data-day="Mon">2</div>
+                                </div>
+                                <div class="calendar-day">
+                                    <div class="calendar-date" data-day="Tue">3</div>
+                                </div>
+                                <div class="calendar-day">
+                                    <div class="calendar-date" data-day="Wed">4</div>
+                                </div>
+                                <div class="calendar-day">
+                                    <div class="calendar-date" data-day="Thu">5</div>
+                                </div>
+                                <div class="calendar-day">
+                                    <div class="calendar-date" data-day="Fri">6</div>
+                                </div>
+                                <div class="calendar-day">
+                                    <div class="calendar-date" data-day="Sat">7</div>
+                                </div>
+                                
+                                <div class="calendar-day">
+                                    <div class="calendar-date" data-day="Sun">8</div>
+                                </div>
+                                <div class="calendar-day">
+                                    <div class="calendar-date" data-day="Mon">9</div>
+                                </div>
+                                <div class="calendar-day">
+                                    <div class="calendar-date" data-day="Tue">10</div>
+                                    <div class="calendar-event landscaping">Landscaping</div>
+                                </div>
+                                <div class="calendar-day">
+                                    <div class="calendar-date" data-day="Wed">11</div>
+                                </div>
+                                <div class="calendar-day">
+                                    <div class="calendar-date" data-day="Thu">12</div>
+                                </div>
+                                <div class="calendar-day">
+                                    <div class="calendar-date" data-day="Fri">13</div>
+                                </div>
+                                <div class="calendar-day">
+                                    <div class="calendar-date" data-day="Sat">14</div>
+                                </div>
+                                
+                                <div class="calendar-day">
+                                    <div class="calendar-date" data-day="Sun">15</div>
+                                </div>
+                                <div class="calendar-day">
+                                    <div class="calendar-date" data-day="Mon">16</div>
+                                </div>
+                                <div class="calendar-day">
+                                    <div class="calendar-date" data-day="Tue">17</div>
+                                </div>
+                                <div class="calendar-day">
+                                    <div class="calendar-date" data-day="Wed">18</div>
+                                    <div class="calendar-event pest-control">Pest Control</div>
+                                </div>
+                                <div class="calendar-day">
+                                    <div class="calendar-date" data-day="Thu">19</div>
+                                </div>
+                                <div class="calendar-day">
+                                    <div class="calendar-date" data-day="Fri">20</div>
+                                </div>
+                                <div class="calendar-day">
+                                    <div class="calendar-date" data-day="Sat">21</div>
+                                </div>
+                                
+                                <div class="calendar-day">
+                                    <div class="calendar-date" data-day="Sun">22</div>
+                                    <div class="calendar-event elevator">Elevator PPM</div>
+                                </div>
+                                <div class="calendar-day">
+                                    <div class="calendar-date" data-day="Mon">23</div>
+                                </div>
+                                <div class="calendar-day">
+                                    <div class="calendar-date" data-day="Tue">24</div>
+                                </div>
+                                <div class="calendar-day">
+                                    <div class="calendar-date" data-day="Wed">25</div>
+                                    <div class="calendar-event ac">AC System PPM</div>
+                                </div>
+                                <div class="calendar-day">
+                                    <div class="calendar-date" data-day="Thu">26</div>
+                                </div>
+                                <div class="calendar-day">
+                                    <div class="calendar-date" data-day="Fri">27</div>
+                                </div>
+                                <div class="calendar-day">
+                                    <div class="calendar-date" data-day="Sat">28</div>
+                                </div>
+                                
+                                <div class="calendar-day">
+                                    <div class="calendar-date" data-day="Sun">29</div>
+                                </div>
+                                <div class="calendar-day">
+                                    <div class="calendar-date" data-day="Mon">30</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        Manage Services
+                    </div>
+                    <div class="card-body">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+                            <div>
+                                <h3 style="margin: 0;">Service Types</h3>
+                            </div>
+                            <div>
+                                <button class="btn">Add New Service</button>
+                            </div>
+                        </div>
+                        
+                        <ul class="service-list">
+                            <li class="service-item">
+                                <div class="service-info">
+                                    <div class="service-title">Pest Control Service</div>
+                                    <div class="service-details">
+                                        <div class="service-detail">
+                                            <span class="service-detail-icon">🔄</span>
+                                            <span>Monthly</span>
+                                        </div>
+                                        <div class="service-detail">
+                                            <span class="service-detail-icon">📍</span>
+                                            <span>All Buildings</span>
+                                        </div>
+                                        <div class="service-detail">
+                                            <span class="service-detail-icon">👤</span>
+                                            <span>External Vendor</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="service-actions">
+                                    <button class="service-action-btn btn-secondary">Edit</button>
+                                    <button class="service-action-btn btn">Schedule</button>
+                                </div>
+                            </li>
+                            <li class="service-item">
+                                <div class="service-info">
+                                    <div class="service-title">Elevator Preventive Maintenance</div>
+                                    <div class="service-details">
+                                        <div class="service-detail">
+                                            <span class="service-detail-icon">🔄</span>
+                                            <span>Quarterly</span>
+                                        </div>
+                                        <div class="service-detail">
+                                            <span class="service-detail-icon">📍</span>
+                                            <span>Main Building</span>
+                                        </div>
+                                        <div class="service-detail">
+                                            <span class="service-detail-icon">👤</span>
+                                            <span>External Vendor</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="service-actions">
+                                    <button class="service-action-btn btn-secondary">Edit</button>
+                                    <button class="service-action-btn btn">Schedule</button>
+                                </div>
+                            </li>
+                            <li class="service-item">
+                                <div class="service-info">
+                                    <div class="service-title">AC System PPM</div>
+                                    <div class="service-details">
+                                        <div class="service-detail">
+                                            <span class="service-detail-icon">🔄</span>
+                                            <span>Monthly</span>
+                                        </div>
+                                        <div class="service-detail">
+                                            <span class="service-detail-icon">📍</span>
+                                            <span>All Buildings</span>
+                                        </div>
+                                        <div class="service-detail">
+                                            <span class="service-detail-icon">👤</span>
+                                            <span>Internal Team</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="service-actions">
+                                    <button class="service-action-btn btn-secondary">Edit</button>
+                                    <button class="service-action-btn btn">Schedule</button>
+                                </div>
+                            </li>
+                            <li class="service-item">
+                                <div class="service-info">
+                                    <div class="service-title">Landscaping</div>
+                                    <div class="service-details">
+                                        <div class="service-detail">
+                                            <span class="service-detail-icon">🔄</span>
+                                            <span>Bi-weekly</span>
+                                        </div>
+                                        <div class="service-detail">
+                                            <span class="service-detail-icon">📍</span>
+                                            <span>Outdoor Areas</span>
+                                        </div>
+                                        <div class="service-detail">
+                                            <span class="service-detail-icon">👤</span>
+                                            <span>External Vendor</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="service-actions">
+                                    <button class="service-action-btn btn-secondary">Edit</button>
+                                    <button class="service-action-btn btn">Schedule</button>
+                                </div>
+                            </li>
+                            <li class="service-item">
+                                <div class="service-info">
+                                    <div class="service-title">Water Tank Cleaning</div>
+                                    <div class="service-details">
+                                        <div class="service-detail">
+                                            <span class="service-detail-icon">🔄</span>
+                                            <span>Quarterly</span>
+                                        </div>
+                                        <div class="service-detail">
+                                            <span class="service-detail-icon">📍</span>
+                                            <span>All Buildings</span>
+                                        </div>
+                                        <div class="service-detail">
+                                            <span class="service-detail-icon">👤</span>
+                                            <span>External Vendor</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="service-actions">
+                                    <button class="service-action-btn btn-secondary">Edit</button>
+                                    <button class="service-action-btn btn">Schedule</button>
+                                </div>
+                            </li>
+                            <li class="service-item">
+                                <div class="service-info">
+                                    <div class="service-title">Water Quality Testing</div>
+                                    <div class="service-details">
+                                        <div class="service-detail">
+                                            <span class="service-detail-icon">🔄</span>
+                                            <span>Monthly</span>
+                                        </div>
+                                        <div class="service-detail">
+                                            <span class="service-detail-icon">📍</span>
+                                            <span>All Buildings</span>
+                                        </div>
+                                        <div class="service-detail">
+                                            <span class="service-detail-icon">👤</span>
+                                            <span>External Vendor</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="service-actions">
+                                    <button class="service-action-btn btn-secondary">Edit</button>
+                                    <button class="service-action-btn btn">Schedule</button>
+                                </div>
+                            </li>
+                            <li class="service-item">
+                                <div class="service-info">
+                                    <div class="service-title">Air Quality Testing</div>
+                                    <div class="service-details">
+                                        <div class="service-detail">
+                                            <span class="service-detail-icon">🔄</span>
+                                            <span>Quarterly</span>
+                                        </div>
+                                        <div class="service-detail">
+                                            <span class="service-detail-icon">📍</span>
+                                            <span>All Buildings</span>
+                                        </div>
+                                        <div class="service-detail">
+                                            <span class="service-detail-icon">👤</span>
+                                            <span>External Vendor</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="service-actions">
+                                    <button class="service-action-btn btn-secondary">Edit</button>
+                                    <button class="service-action-btn btn">Schedule</button>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        Department Management
+                    </div>
+                    <div class="card-body">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+                            <div>
+                                <h3 style="margin: 0;">School Departments</h3>
+                            </div>
+                            <div>
+                                <button class="btn">Add Department</button>
+                            </div>
+                        </div>
+                        
+                        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;">
+                            <div class="card">
+                                <div class="card-header">
+                                    Canteen
+                                </div>
+                                <div class="card-body">
+                                    <div style="margin-bottom: 15px;">
+                                        <strong>Manager:</strong> Aisha Al Nasser
+                                    </div>
+                                    <div style="margin-bottom: 15px;">
+                                        <strong>Staff Count:</strong> 8
+                                    </div>
+                                    <div style="margin-bottom: 15px;">
+                                        <strong>Location:</strong> Building A, Ground Floor
+                                    </div>
+                                    <div style="margin-bottom: 15px;">
+                                        <strong>Open Hours:</strong> 7:00 AM - 3:00 PM
+                                    </div>
+                                    <div style="display: flex; justify-content: flex-end;">
+                                        <button class="btn btn-secondary">View Details</button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="card">
+                                <div class="card-header">
+                                    Clinic
+                                </div>
+                                <div class="card-body">
+                                    <div style="margin-bottom: 15px;">
+                                        <strong>Manager:</strong> Dr. Layla Mahmoud
+                                    </div>
+                                    <div style="margin-bottom: 15px;">
+                                        <strong>Staff Count:</strong> 3
+                                    </div>
+                                    <div style="margin-bottom: 15px;">
+                                        <strong>Location:</strong> Building B, Ground Floor
+                                    </div>
+                                    <div style="margin-bottom: 15px;">
+                                        <strong>Open Hours:</strong> 7:30 AM - 3:30 PM
+                                    </div>
+                                    <div style="display: flex; justify-content: flex-end;">
+                                        <button class="btn btn-secondary">View Details</button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="card">
+                                <div class="card-header">
+                                    Security
+                                </div>
+                                <div class="card-body">
+                                    <div style="margin-bottom: 15px;">
+                                        <strong>Manager:</strong> Khalid Al Suwaidi
+                                    </div>
+                                    <div style="margin-bottom: 15px;">
+                                        <strong>Staff Count:</strong> 6
+                                    </div>
+                                    <div style="margin-bottom: 15px;">
+                                        <strong>Location:</strong> Main Entrance
+                                    </div>
+                                    <div style="margin-bottom: 15px;">
+                                        <strong>Hours:</strong> 24/7
+                                    </div>
+                                    <div style="display: flex; justify-content: flex-end;">
+                                        <button class="btn btn-secondary">View Details</button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="card">
+                                <div class="card-header">
+                                    Housekeeping
+                                </div>
+                                <div class="card-body">
+                                    <div style="margin-bottom: 15px;">
+                                        <strong>Manager:</strong> Ahmed Hassan
+                                    </div>
+                                    <div style="margin-bottom: 15px;">
+                                        <strong>Staff Count:</strong> 12
+                                    </div>
+                                    <div style="margin-bottom: 15px;">
+                                        <strong>Location:</strong> Building A, Basement
+                                    </div>
+                                    <div style="margin-bottom: 15px;">
+                                        <strong>Hours:</strong> 6:00 AM - 5:00 PM
+                                    </div>
+                                    <div style="display: flex; justify-content: flex-end;">
+                                        <button class="btn btn-secondary">View Details</button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="card">
+                                <div class="card-header">
+                                    Maintenance
+                                </div>
+                                <div class="card-body">
+                                    <div style="margin-bottom: 15px;">
+                                        <strong>Manager:</strong> Mohammed Al Mansouri
+                                    </div>
+                                    <div style="margin-bottom: 15px;">
+                                        <strong>Staff Count:</strong> 5
+                                    </div>
+                                    <div style="margin-bottom: 15px;">
+                                        <strong>Location:</strong> Building A, Basement
+                                    </div>
+                                    <div style="margin-bottom: 15px;">
+                                        <strong>Hours:</strong> 7:00 AM - 4:00 PM
+                                    </div>
+                                    <div style="display: flex; justify-content: flex-end;">
+                                        <button class="btn btn-secondary">View Details</button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="card">
+                                <div class="card-header">
+                                    Transportation
+                                </div>
+                                <div class="card-body">
+                                    <div style="margin-bottom: 15px;">
+                                        <strong>Manager:</strong> Saeed Al Dhaheri
+                                    </div>
+                                    <div style="margin-bottom: 15px;">
+                                        <strong>Staff Count:</strong> 15
+                                    </div>
+                                    <div style="margin-bottom: 15px;">
+                                        <strong>Location:</strong> Parking Area
+                                    </div>
+                                    <div style="margin-bottom: 15px;">
+                                        <strong>Hours:</strong> 6:00 AM - 5:00 PM
+                                    </div>
+                                    <div style="display: flex; justify-content: flex-end;">
+                                        <button class="btn btn-secondary">View Details</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

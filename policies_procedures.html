@@ -1,0 +1,1799 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EHS App - Policies and Procedures</title>
+    <style>
+        :root {
+            --primary-green: #2E8B57;
+            --light-green: #8FBC8F;
+            --dark-green: #006400;
+            --white: #FFFFFF;
+            --light-gray: #F5F5F5;
+            --dark-gray: #333333;
+            --warning-yellow: #FFD700;
+            --danger-red: #DC3545;
+            --info-blue: #17A2B8;
+        }
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--light-gray);
+            color: var(--dark-gray);
+        }
+        
+        .layout {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        .sidebar {
+            width: 250px;
+            background-color: var(--dark-green);
+            color: var(--white);
+            padding: 0;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+        }
+        
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--primary-green);
+        }
+        
+        .sidebar-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .sidebar-menu li {
+            padding: 0;
+        }
+        
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            color: var(--white);
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+        
+        .sidebar-menu a:hover, .sidebar-menu a.active {
+            background-color: var(--primary-green);
+        }
+        
+        .sidebar-menu .icon {
+            margin-right: 10px;
+            width: 20px;
+            height: 20px;
+            background-color: var(--white);
+            border-radius: 50%;
+        }
+        
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            margin-top: 60px;
+        }
+        
+        .topbar {
+            position: fixed;
+            top: 0;
+            right: 0;
+            left: 250px;
+            height: 60px;
+            background-color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            z-index: 100;
+        }
+        
+        .topbar-left {
+            display: flex;
+            align-items: center;
+        }
+        
+        .topbar-right {
+            display: flex;
+            align-items: center;
+        }
+        
+        .notification-icon {
+            margin-right: 20px;
+            position: relative;
+        }
+        
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            width: 10px;
+            height: 10px;
+            background-color: var(--danger-red);
+            border-radius: 50%;
+        }
+        
+        .user-profile {
+            display: flex;
+            align-items: center;
+        }
+        
+        .avatar {
+            width: 32px;
+            height: 32px;
+            background-color: var(--primary-green);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        
+        .user-info {
+            line-height: 1.2;
+        }
+        
+        .user-name {
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        
+        .user-role {
+            font-size: 0.8rem;
+            color: #666;
+        }
+        
+        .page-header {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .page-title {
+            margin: 0;
+            color: var(--dark-green);
+            font-size: 1.8rem;
+        }
+        
+        .page-subtitle {
+            margin: 5px 0 0;
+            color: #666;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: var(--primary-green);
+            color: var(--white);
+            border: none;
+            border-radius: 4px;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+        
+        .btn:hover {
+            background-color: var(--dark-green);
+        }
+        
+        .btn-secondary {
+            background-color: var(--white);
+            color: var(--primary-green);
+            border: 1px solid var(--primary-green);
+        }
+        
+        .btn-secondary:hover {
+            background-color: var(--light-green);
+            color: var(--dark-green);
+        }
+        
+        .card {
+            background-color: var(--white);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .card-header {
+            background-color: var(--primary-green);
+            color: var(--white);
+            padding: 15px 20px;
+            font-weight: bold;
+        }
+        
+        .card-body {
+            padding: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        
+        .form-select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            background-color: var(--white);
+        }
+        
+        .form-textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .form-row {
+            display: flex;
+            margin-left: -10px;
+            margin-right: -10px;
+        }
+        
+        .form-col {
+            flex: 1;
+            padding-left: 10px;
+            padding-right: 10px;
+        }
+        
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            font-weight: 500;
+        }
+        
+        .tab.active {
+            border-bottom-color: var(--primary-green);
+            color: var(--primary-green);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .badge-success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .badge-warning {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        
+        .badge-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        .badge-info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+        }
+        
+        .badge-secondary {
+            background-color: #e2e3e5;
+            color: #383d41;
+        }
+        
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background-color: var(--white);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary-green);
+            margin: 10px 0;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .document-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .document-card {
+            background-color: var(--white);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        
+        .document-card-image {
+            height: 160px;
+            background-color: #eee;
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: var(--primary-green);
+        }
+        
+        .document-card-content {
+            padding: 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .document-card-title {
+            font-size: 1.2rem;
+            font-weight: 500;
+            margin-bottom: 10px;
+            color: var(--dark-green);
+        }
+        
+        .document-card-description {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 15px;
+            flex: 1;
+        }
+        
+        .document-card-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: #666;
+            margin-bottom: 15px;
+        }
+        
+        .document-card-actions {
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .document-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .document-item {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .document-item:last-child {
+            border-bottom: none;
+        }
+        
+        .document-item:hover {
+            background-color: #f9f9f9;
+        }
+        
+        .document-info {
+            flex: 1;
+        }
+        
+        .document-title {
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+        
+        .document-details {
+            display: flex;
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .document-detail {
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .document-detail-icon {
+            margin-right: 5px;
+        }
+        
+        .document-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .document-action-btn {
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+        
+        .file-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .file-item {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+        }
+        
+        .file-item:last-child {
+            border-bottom: none;
+        }
+        
+        .file-icon {
+            width: 40px;
+            height: 40px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 1.2rem;
+        }
+        
+        .file-info {
+            flex: 1;
+        }
+        
+        .file-name {
+            font-weight: 500;
+            margin-bottom: 3px;
+        }
+        
+        .file-meta {
+            font-size: 0.8rem;
+            color: #666;
+        }
+        
+        .file-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .file-action-btn {
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+        
+        .search-container {
+            margin-bottom: 20px;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        
+        .filter-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .filter-select {
+            padding: 8px 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: var(--white);
+        }
+        
+        .document-preview {
+            margin-bottom: 20px;
+        }
+        
+        .document-preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .document-preview-title {
+            font-size: 1.5rem;
+            font-weight: 500;
+            color: var(--dark-green);
+        }
+        
+        .document-preview-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .document-preview-meta {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .document-preview-content {
+            padding: 20px;
+            background-color: var(--white);
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .document-preview-footer {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .document-preview-pagination {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .document-preview-page {
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .document-preview-page.active {
+            background-color: var(--primary-green);
+            color: var(--white);
+            border-color: var(--primary-green);
+        }
+        
+        .document-preview-zoom {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .document-preview-zoom-btn {
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .document-preview-zoom-level {
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .document-upload {
+            margin-bottom: 20px;
+        }
+        
+        .document-upload-dropzone {
+            border: 2px dashed #ddd;
+            padding: 30px;
+            text-align: center;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: border-color 0.3s;
+        }
+        
+        .document-upload-dropzone:hover {
+            border-color: var(--primary-green);
+        }
+        
+        .document-upload-icon {
+            font-size: 3rem;
+            color: var(--primary-green);
+            margin-bottom: 15px;
+        }
+        
+        .document-upload-text {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+        
+        .document-upload-subtext {
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .document-upload-progress {
+            margin-top: 20px;
+        }
+        
+        .document-upload-progress-bar {
+            height: 8px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 5px;
+        }
+        
+        .document-upload-progress-fill {
+            height: 100%;
+            background-color: var(--primary-green);
+            width: 75%;
+        }
+        
+        .document-upload-progress-text {
+            font-size: 0.9rem;
+            color: #666;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .document-upload-files {
+            margin-top: 20px;
+        }
+        
+        .document-upload-file {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+        
+        .document-upload-file-info {
+            display: flex;
+            align-items: center;
+        }
+        
+        .document-upload-file-icon {
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+        
+        .document-upload-file-name {
+            font-size: 0.9rem;
+        }
+        
+        .document-upload-file-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .document-upload-file-action {
+            cursor: pointer;
+            color: #666;
+        }
+        
+        .document-upload-file-action:hover {
+            color: var(--primary-green);
+        }
+        
+        /* Mobile styles */
+        @media (max-width: 768px) {
+            .layout {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                height: 60px;
+                z-index: 100;
+            }
+            
+            .sidebar-header {
+                display: none;
+            }
+            
+            .sidebar-menu {
+                display: flex;
+                height: 100%;
+            }
+            
+            .sidebar-menu li {
+                flex: 1;
+            }
+            
+            .sidebar-menu a {
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                padding: 5px;
+                height: 100%;
+                font-size: 0.8rem;
+            }
+            
+            .sidebar-menu .icon {
+                margin-right: 0;
+                margin-bottom: 5px;
+            }
+            
+            .topbar {
+                left: 0;
+            }
+            
+            .main-content {
+                margin-bottom: 60px;
+                margin-top: 60px;
+                padding: 15px;
+            }
+            
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .page-header > div:last-child {
+                margin-top: 10px;
+                width: 100%;
+                display: flex;
+                gap: 10px;
+            }
+            
+            .page-header .btn {
+                flex: 1;
+                text-align: center;
+            }
+            
+            .form-row {
+                flex-direction: column;
+            }
+            
+            .form-col {
+                padding: 0;
+            }
+            
+            .stats-container {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .document-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .filter-container {
+                flex-direction: column;
+            }
+            
+            .document-preview-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .document-preview-actions {
+                margin-top: 10px;
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .document-preview-meta {
+                flex-direction: column;
+                gap: 5px;
+            }
+            
+            .document-preview-footer {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .document-preview-pagination {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .document-preview-zoom {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="layout">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2>EHS App</h2>
+            </div>
+            <ul class="sidebar-menu">
+                <li><a href="#">
+                    <span class="icon">📊</span>
+                    Dashboard
+                </a></li>
+                <li><a href="#">
+                    <span class="icon">⚠️</span>
+                    Incidents
+                </a></li>
+                <li><a href="#">
+                    <span class="icon">🔍</span>
+                    Risk Assessment
+                </a></li>
+                <li><a href="#">
+                    <span class="icon">📋</span>
+                    Audits
+                </a></li>
+                <li><a href="#" class="active">
+                    <span class="icon">📑</span>
+                    Policies
+                </a></li>
+                <li><a href="#">
+                    <span class="icon">⚙️</span>
+                    Settings
+                </a></li>
+            </ul>
+        </div>
+        
+        <div class="main-content">
+            <div class="topbar">
+                <div class="topbar-left">
+                    <h1 style="margin: 0; color: var(--primary-green);">EHS App</h1>
+                </div>
+                <div class="topbar-right">
+                    <div class="notification-icon">
+                        <span>🔔</span>
+                        <span class="notification-badge"></span>
+                    </div>
+                    <div class="user-profile">
+                        <div class="avatar">US</div>
+                        <div class="user-info">
+                            <div class="user-name">User Name</div>
+                            <div class="user-role">HSE Manager</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title">Policies and Procedures</h1>
+                    <p class="page-subtitle">Access and manage all EHS policies, procedures, and guidelines</p>
+                </div>
+                <div>
+                    <a href="#" class="btn btn-secondary">Recent Documents</a>
+                    <a href="#" class="btn">Upload Document</a>
+                </div>
+            </div>
+            
+            <div class="tabs">
+                <div class="tab active">Browse</div>
+                <div class="tab">ADEK Policies</div>
+                <div class="tab">MOE Policies</div>
+                <div class="tab">School Policies</div>
+                <div class="tab">Procedures</div>
+            </div>
+            
+            <div class="tab-content active">
+                <div class="search-container">
+                    <input type="text" class="search-input" placeholder="Search policies and procedures...">
+                </div>
+                
+                <div class="filter-container">
+                    <select class="filter-select">
+                        <option>All Categories</option>
+                        <option>Health</option>
+                        <option>Safety</option>
+                        <option>Environment</option>
+                        <option>Emergency</option>
+                        <option>Facilities</option>
+                    </select>
+                    <select class="filter-select">
+                        <option>All Sources</option>
+                        <option>ADEK</option>
+                        <option>MOE</option>
+                        <option>School</option>
+                        <option>External</option>
+                    </select>
+                    <select class="filter-select">
+                        <option>All Departments</option>
+                        <option>Administration</option>
+                        <option>Teaching Staff</option>
+                        <option>Facilities</option>
+                        <option>Housekeeping</option>
+                        <option>Canteen</option>
+                        <option>Clinic</option>
+                        <option>Security</option>
+                        <option>Transportation</option>
+                    </select>
+                    <select class="filter-select">
+                        <option>Sort By: Newest</option>
+                        <option>Sort By: Oldest</option>
+                        <option>Sort By: A-Z</option>
+                        <option>Sort By: Z-A</option>
+                    </select>
+                </div>
+                
+                <div class="stats-container">
+                    <div class="stat-card">
+                        <div class="stat-label">Total Documents</div>
+                        <div class="stat-value">128</div>
+                        <div>Policies and procedures</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">ADEK Policies</div>
+                        <div class="stat-value">42</div>
+                        <div>Official requirements</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">MOE Policies</div>
+                        <div class="stat-value">35</div>
+                        <div>Official requirements</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">School Policies</div>
+                        <div class="stat-value">51</div>
+                        <div>Internal policies</div>
+                    </div>
+                </div>
+                
+                <div class="document-grid">
+                    <div class="document-card">
+                        <div class="document-card-image">📄</div>
+                        <div class="document-card-content">
+                            <div class="document-card-title">EHS Policy Statement</div>
+                            <div class="document-card-description">Official school policy statement on Environment, Health, and Safety commitments and responsibilities.</div>
+                            <div class="document-card-meta">
+                                <div>Source: School</div>
+                                <div>Updated: Mar 15, 2025</div>
+                            </div>
+                            <div class="document-card-actions">
+                                <span class="badge badge-info">Policy</span>
+                                <button class="btn">View</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="document-card">
+                        <div class="document-card-image">📄</div>
+                        <div class="document-card-content">
+                            <div class="document-card-title">ADEK School Health and Safety Manual</div>
+                            <div class="document-card-description">Comprehensive guide to health and safety requirements for schools as mandated by ADEK.</div>
+                            <div class="document-card-meta">
+                                <div>Source: ADEK</div>
+                                <div>Updated: Feb 28, 2025</div>
+                            </div>
+                            <div class="document-card-actions">
+                                <span class="badge badge-info">Policy</span>
+                                <button class="btn">View</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="document-card">
+                        <div class="document-card-image">📄</div>
+                        <div class="document-card-content">
+                            <div class="document-card-title">MOE OEHSMS Standards</div>
+                            <div class="document-card-description">Occupational and Environmental Health and Safety Management System standards for educational institutions.</div>
+                            <div class="document-card-meta">
+                                <div>Source: MOE</div>
+                                <div>Updated: Jan 20, 2025</div>
+                            </div>
+                            <div class="document-card-actions">
+                                <span class="badge badge-info">Policy</span>
+                                <button class="btn">View</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="document-card">
+                        <div class="document-card-image">📄</div>
+                        <div class="document-card-content">
+                            <div class="document-card-title">Emergency Response Procedures</div>
+                            <div class="document-card-description">Step-by-step procedures for responding to various emergency situations including fire, medical emergencies, and natural disasters.</div>
+                            <div class="document-card-meta">
+                                <div>Source: School</div>
+                                <div>Updated: Mar 5, 2025</div>
+                            </div>
+                            <div class="document-card-actions">
+                                <span class="badge badge-secondary">Procedure</span>
+                                <button class="btn">View</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="document-card">
+                        <div class="document-card-image">📄</div>
+                        <div class="document-card-content">
+                            <div class="document-card-title">Chemical Safety Guidelines</div>
+                            <div class="document-card-description">Guidelines for safe handling, storage, and disposal of chemicals in school laboratories and facilities.</div>
+                            <div class="document-card-meta">
+                                <div>Source: School</div>
+                                <div>Updated: Apr 1, 2025</div>
+                            </div>
+                            <div class="document-card-actions">
+                                <span class="badge badge-secondary">Procedure</span>
+                                <button class="btn">View</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="document-card">
+                        <div class="document-card-image">📄</div>
+                        <div class="document-card-content">
+                            <div class="document-card-title">Incident Reporting Procedure</div>
+                            <div class="document-card-description">Procedures for reporting, investigating, and documenting incidents, accidents, and near misses.</div>
+                            <div class="document-card-meta">
+                                <div>Source: School</div>
+                                <div>Updated: Mar 20, 2025</div>
+                            </div>
+                            <div class="document-card-actions">
+                                <span class="badge badge-secondary">Procedure</span>
+                                <button class="btn">View</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        Recently Updated Documents
+                    </div>
+                    <div class="card-body">
+                        <ul class="document-list">
+                            <li class="document-item">
+                                <div class="document-info">
+                                    <div class="document-title">Chemical Safety Guidelines</div>
+                                    <div class="document-details">
+                                        <div class="document-detail">
+                                            <span class="document-detail-icon">📂</span>
+                                            <span>Safety</span>
+                                        </div>
+                                        <div class="document-detail">
+                                            <span class="document-detail-icon">🏢</span>
+                                            <span>School</span>
+                                        </div>
+                                        <div class="document-detail">
+                                            <span class="document-detail-icon">🕒</span>
+                                            <span>Updated: Apr 1, 2025</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="document-actions">
+                                    <button class="document-action-btn btn-secondary">Download</button>
+                                    <button class="document-action-btn btn">View</button>
+                                </div>
+                            </li>
+                            <li class="document-item">
+                                <div class="document-info">
+                                    <div class="document-title">EHS Policy Statement</div>
+                                    <div class="document-details">
+                                        <div class="document-detail">
+                                            <span class="document-detail-icon">📂</span>
+                                            <span>Policy</span>
+                                        </div>
+                                        <div class="document-detail">
+                                            <span class="document-detail-icon">🏢</span>
+                                            <span>School</span>
+                                        </div>
+                                        <div class="document-detail">
+                                            <span class="document-detail-icon">🕒</span>
+                                            <span>Updated: Mar 15, 2025</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="document-actions">
+                                    <button class="document-action-btn btn-secondary">Download</button>
+                                    <button class="document-action-btn btn">View</button>
+                                </div>
+                            </li>
+                            <li class="document-item">
+                                <div class="document-info">
+                                    <div class="document-title">Emergency Response Procedures</div>
+                                    <div class="document-details">
+                                        <div class="document-detail">
+                                            <span class="document-detail-icon">📂</span>
+                                            <span>Procedure</span>
+                                        </div>
+                                        <div class="document-detail">
+                                            <span class="document-detail-icon">🏢</span>
+                                            <span>School</span>
+                                        </div>
+                                        <div class="document-detail">
+                                            <span class="document-detail-icon">🕒</span>
+                                            <span>Updated: Mar 5, 2025</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="document-actions">
+                                    <button class="document-action-btn btn-secondary">Download</button>
+                                    <button class="document-action-btn btn">View</button>
+                                </div>
+                            </li>
+                            <li class="document-item">
+                                <div class="document-info">
+                                    <div class="document-title">ADEK School Health and Safety Manual</div>
+                                    <div class="document-details">
+                                        <div class="document-detail">
+                                            <span class="document-detail-icon">📂</span>
+                                            <span>Policy</span>
+                                        </div>
+                                        <div class="document-detail">
+                                            <span class="document-detail-icon">🏢</span>
+                                            <span>ADEK</span>
+                                        </div>
+                                        <div class="document-detail">
+                                            <span class="document-detail-icon">🕒</span>
+                                            <span>Updated: Feb 28, 2025</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="document-actions">
+                                    <button class="document-action-btn btn-secondary">Download</button>
+                                    <button class="document-action-btn btn">View</button>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tab-content">
+                <div class="search-container">
+                    <input type="text" class="search-input" placeholder="Search ADEK policies...">
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        ADEK Health and Safety Policies
+                    </div>
+                    <div class="card-body">
+                        <ul class="file-list">
+                            <li class="file-item">
+                                <div class="file-icon">📄</div>
+                                <div class="file-info">
+                                    <div class="file-name">ADEK School Health and Safety Manual.pdf</div>
+                                    <div class="file-meta">PDF Document • 8.5 MB • Updated: Feb 28, 2025</div>
+                                </div>
+                                <div class="file-actions">
+                                    <button class="file-action-btn btn-secondary">Download</button>
+                                    <button class="file-action-btn btn">View</button>
+                                </div>
+                            </li>
+                            <li class="file-item">
+                                <div class="file-icon">📄</div>
+                                <div class="file-info">
+                                    <div class="file-name">ADEK Emergency Management Framework.pdf</div>
+                                    <div class="file-meta">PDF Document • 5.2 MB • Updated: Jan 15, 2025</div>
+                                </div>
+                                <div class="file-actions">
+                                    <button class="file-action-btn btn-secondary">Download</button>
+                                    <button class="file-action-btn btn">View</button>
+                                </div>
+                            </li>
+                            <li class="file-item">
+                                <div class="file-icon">📄</div>
+                                <div class="file-info">
+                                    <div class="file-name">ADEK School Facilities Safety Requirements.pdf</div>
+                                    <div class="file-meta">PDF Document • 6.8 MB • Updated: Dec 10, 2024</div>
+                                </div>
+                                <div class="file-actions">
+                                    <button class="file-action-btn btn-secondary">Download</button>
+                                    <button class="file-action-btn btn">View</button>
+                                </div>
+                            </li>
+                            <li class="file-item">
+                                <div class="file-icon">📄</div>
+                                <div class="file-info">
+                                    <div class="file-name">ADEK Laboratory Safety Guidelines.pdf</div>
+                                    <div class="file-meta">PDF Document • 4.5 MB • Updated: Feb 5, 2025</div>
+                                </div>
+                                <div class="file-actions">
+                                    <button class="file-action-btn btn-secondary">Download</button>
+                                    <button class="file-action-btn btn">View</button>
+                                </div>
+                            </li>
+                            <li class="file-item">
+                                <div class="file-icon">📄</div>
+                                <div class="file-info">
+                                    <div class="file-name">ADEK School Transportation Safety Policy.pdf</div>
+                                    <div class="file-meta">PDF Document • 3.2 MB • Updated: Jan 20, 2025</div>
+                                </div>
+                                <div class="file-actions">
+                                    <button class="file-action-btn btn-secondary">Download</button>
+                                    <button class="file-action-btn btn">View</button>
+                                </div>
+                            </li>
+                            <li class="file-item">
+                                <div class="file-icon">📄</div>
+                                <div class="file-info">
+                                    <div class="file-name">ADEK Food Safety Requirements for School Canteens.pdf</div>
+                                    <div class="file-meta">PDF Document • 4.1 MB • Updated: Mar 1, 2025</div>
+                                </div>
+                                <div class="file-actions">
+                                    <button class="file-action-btn btn-secondary">Download</button>
+                                    <button class="file-action-btn btn">View</button>
+                                </div>
+                            </li>
+                            <li class="file-item">
+                                <div class="file-icon">📄</div>
+                                <div class="file-info">
+                                    <div class="file-name">ADEK School Clinic Requirements.pdf</div>
+                                    <div class="file-meta">PDF Document • 5.5 MB • Updated: Feb 15, 2025</div>
+                                </div>
+                                <div class="file-actions">
+                                    <button class="file-action-btn btn-secondary">Download</button>
+                                    <button class="file-action-btn btn">View</button>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tab-content">
+                <div class="search-container">
+                    <input type="text" class="search-input" placeholder="Search MOE policies...">
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        MOE Health and Safety Policies
+                    </div>
+                    <div class="card-body">
+                        <ul class="file-list">
+                            <li class="file-item">
+                                <div class="file-icon">📄</div>
+                                <div class="file-info">
+                                    <div class="file-name">MOE OEHSMS Standards.pdf</div>
+                                    <div class="file-meta">PDF Document • 7.2 MB • Updated: Jan 20, 2025</div>
+                                </div>
+                                <div class="file-actions">
+                                    <button class="file-action-btn btn-secondary">Download</button>
+                                    <button class="file-action-btn btn">View</button>
+                                </div>
+                            </li>
+                            <li class="file-item">
+                                <div class="file-icon">📄</div>
+                                <div class="file-info">
+                                    <div class="file-name">MOE School Safety Framework.pdf</div>
+                                    <div class="file-meta">PDF Document • 6.5 MB • Updated: Dec 5, 2024</div>
+                                </div>
+                                <div class="file-actions">
+                                    <button class="file-action-btn btn-secondary">Download</button>
+                                    <button class="file-action-btn btn">View</button>
+                                </div>
+                            </li>
+                            <li class="file-item">
+                                <div class="file-icon">📄</div>
+                                <div class="file-info">
+                                    <div class="file-name">MOE Environmental Standards for Schools.pdf</div>
+                                    <div class="file-meta">PDF Document • 5.8 MB • Updated: Feb 10, 2025</div>
+                                </div>
+                                <div class="file-actions">
+                                    <button class="file-action-btn btn-secondary">Download</button>
+                                    <button class="file-action-btn btn">View</button>
+                                </div>
+                            </li>
+                            <li class="file-item">
+                                <div class="file-icon">📄</div>
+                                <div class="file-info">
+                                    <div class="file-name">MOE School Building Safety Requirements.pdf</div>
+                                    <div class="file-meta">PDF Document • 8.3 MB • Updated: Jan 15, 2025</div>
+                                </div>
+                                <div class="file-actions">
+                                    <button class="file-action-btn btn-secondary">Download</button>
+                                    <button class="file-action-btn btn">View</button>
+                                </div>
+                            </li>
+                            <li class="file-item">
+                                <div class="file-icon">📄</div>
+                                <div class="file-info">
+                                    <div class="file-name">MOE School Health Services Guidelines.pdf</div>
+                                    <div class="file-meta">PDF Document • 4.7 MB • Updated: Mar 5, 2025</div>
+                                </div>
+                                <div class="file-actions">
+                                    <button class="file-action-btn btn-secondary">Download</button>
+                                    <button class="file-action-btn btn">View</button>
+                                </div>
+                            </li>
+                            <li class="file-item">
+                                <div class="file-icon">📄</div>
+                                <div class="file-info">
+                                    <div class="file-name">MOE Physical Education Safety Guidelines.pdf</div>
+                                    <div class="file-meta">PDF Document • 3.9 MB • Updated: Feb 20, 2025</div>
+                                </div>
+                                <div class="file-actions">
+                                    <button class="file-action-btn btn-secondary">Download</button>
+                                    <button class="file-action-btn btn">View</button>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tab-content">
+                <div class="search-container">
+                    <input type="text" class="search-input" placeholder="Search school policies...">
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        School Health and Safety Policies
+                    </div>
+                    <div class="card-body">
+                        <ul class="file-list">
+                            <li class="file-item">
+                                <div class="file-icon">📄</div>
+                                <div class="file-info">
+                                    <div class="file-name">EHS Policy Statement.pdf</div>
+                                    <div class="file-meta">PDF Document • 1.2 MB • Updated: Mar 15, 2025</div>
+                                </div>
+                                <div class="file-actions">
+                                    <button class="file-action-btn btn-secondary">Download</button>
+                                    <button class="file-action-btn btn">View</button>
+                                </div>
+                            </li>
+                            <li class="file-item">
+                                <div class="file-icon">📄</div>
+                                <div class="file-info">
+                                    <div class="file-name">School Safety Committee Charter.pdf</div>
+                                    <div class="file-meta">PDF Document • 2.1 MB • Updated: Feb 25, 2025</div>
+                                </div>
+                                <div class="file-actions">
+                                    <button class="file-action-btn btn-secondary">Download</button>
+                                    <button class="file-action-btn btn">View</button>
+                                </div>
+                            </li>
+                            <li class="file-item">
+                                <div class="file-icon">📄</div>
+                                <div class="file-info">
+                                    <div class="file-name">School Emergency Response Plan.pdf</div>
+                                    <div class="file-meta">PDF Document • 4.5 MB • Updated: Jan 30, 2025</div>
+                                </div>
+                                <div class="file-actions">
+                                    <button class="file-action-btn btn-secondary">Download</button>
+                                    <button class="file-action-btn btn">View</button>
+                                </div>
+                            </li>
+                            <li class="file-item">
+                                <div class="file-icon">📄</div>
+                                <div class="file-info">
+                                    <div class="file-name">School Laboratory Safety Policy.pdf</div>
+                                    <div class="file-meta">PDF Document • 3.8 MB • Updated: Feb 10, 2025</div>
+                                </div>
+                                <div class="file-actions">
+                                    <button class="file-action-btn btn-secondary">Download</button>
+                                    <button class="file-action-btn btn">View</button>
+                                </div>
+                            </li>
+                            <li class="file-item">
+                                <div class="file-icon">📄</div>
+                                <div class="file-info">
+                                    <div class="file-name">School Facilities Maintenance Policy.pdf</div>
+                                    <div class="file-meta">PDF Document • 2.9 MB • Updated: Mar 5, 2025</div>
+                                </div>
+                                <div class="file-actions">
+                                    <button class="file-action-btn btn-secondary">Download</button>
+                                    <button class="file-action-btn btn">View</button>
+                                </div>
+                            </li>
+                            <li class="file-item">
+                                <div class="file-icon">📄</div>
+                                <div class="file-info">
+                                    <div class="file-name">School Incident Reporting Policy.pdf</div>
+                                    <div class="file-meta">PDF Document • 2.3 MB • Updated: Feb 15, 2025</div>
+                                </div>
+                                <div class="file-actions">
+                                    <button class="file-action-btn btn-secondary">Download</button>
+                                    <button class="file-action-btn btn">View</button>
+                                </div>
+                            </li>
+                            <li class="file-item">
+                                <div class="file-icon">📄</div>
+                                <div class="file-info">
+                                    <div class="file-name">School Environmental Policy.pdf</div>
+                                    <div class="file-meta">PDF Document • 1.8 MB • Updated: Jan 20, 2025</div>
+                                </div>
+                                <div class="file-actions">
+                                    <button class="file-action-btn btn-secondary">Download</button>
+                                    <button class="file-action-btn btn">View</button>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tab-content">
+                <div class="search-container">
+                    <input type="text" class="search-input" placeholder="Search procedures...">
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        EHS Procedures
+                    </div>
+                    <div class="card-body">
+                        <ul class="file-list">
+                            <li class="file-item">
+                                <div class="file-icon">📄</div>
+                                <div class="file-info">
+                                    <div class="file-name">Emergency Response Procedures.pdf</div>
+                                    <div class="file-meta">PDF Document • 5.2 MB • Updated: Mar 5, 2025</div>
+                                </div>
+                                <div class="file-actions">
+                                    <button class="file-action-btn btn-secondary">Download</button>
+                                    <button class="file-action-btn btn">View</button>
+                                </div>
+                            </li>
+                            <li class="file-item">
+                                <div class="file-icon">📄</div>
+                                <div class="file-info">
+                                    <div class="file-name">Chemical Safety Guidelines.pdf</div>
+                                    <div class="file-meta">PDF Document • 4.1 MB • Updated: Apr 1, 2025</div>
+                                </div>
+                                <div class="file-actions">
+                                    <button class="file-action-btn btn-secondary">Download</button>
+                                    <button class="file-action-btn btn">View</button>
+                                </div>
+                            </li>
+                            <li class="file-item">
+                                <div class="file-icon">📄</div>
+                                <div class="file-info">
+                                    <div class="file-name">Incident Reporting Procedure.pdf</div>
+                                    <div class="file-meta">PDF Document • 3.5 MB • Updated: Mar 20, 2025</div>
+                                </div>
+                                <div class="file-actions">
+                                    <button class="file-action-btn btn-secondary">Download</button>
+                                    <button class="file-action-btn btn">View</button>
+                                </div>
+                            </li>
+                            <li class="file-item">
+                                <div class="file-icon">📄</div>
+                                <div class="file-info">
+                                    <div class="file-name">Risk Assessment Procedure.pdf</div>
+                                    <div class="file-meta">PDF Document • 2.8 MB • Updated: Feb 15, 2025</div>
+                                </div>
+                                <div class="file-actions">
+                                    <button class="file-action-btn btn-secondary">Download</button>
+                                    <button class="file-action-btn btn">View</button>
+                                </div>
+                            </li>
+                            <li class="file-item">
+                                <div class="file-icon">📄</div>
+                                <div class="file-info">
+                                    <div class="file-name">Maintenance Request Procedure.pdf</div>
+                                    <div class="file-meta">PDF Document • 2.3 MB • Updated: Mar 10, 2025</div>
+                                </div>
+                                <div class="file-actions">
+                                    <button class="file-action-btn btn-secondary">Download</button>
+                                    <button class="file-action-btn btn">View</button>
+                                </div>
+                            </li>
+                            <li class="file-item">
+                                <div class="file-icon">📄</div>
+                                <div class="file-info">
+                                    <div class="file-name">Audit and Inspection Procedure.pdf</div>
+                                    <div class="file-meta">PDF Document • 3.2 MB • Updated: Feb 25, 2025</div>
+                                </div>
+                                <div class="file-actions">
+                                    <button class="file-action-btn btn-secondary">Download</button>
+                                    <button class="file-action-btn btn">View</button>
+                                </div>
+                            </li>
+                            <li class="file-item">
+                                <div class="file-icon">📄</div>
+                                <div class="file-info">
+                                    <div class="file-name">Housekeeping Procedures.pdf</div>
+                                    <div class="file-meta">PDF Document • 2.7 MB • Updated: Mar 15, 2025</div>
+                                </div>
+                                <div class="file-actions">
+                                    <button class="file-action-btn btn-secondary">Download</button>
+                                    <button class="file-action-btn btn">View</button>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Document Preview (Hidden by default, would be shown when a document is selected) -->
+    <div style="display: none;">
+        <div class="document-preview">
+            <div class="document-preview-header">
+                <div class="document-preview-title">EHS Policy Statement</div>
+                <div class="document-preview-actions">
+                    <button class="btn btn-secondary">Download</button>
+                    <button class="btn btn-secondary">Print</button>
+                    <button class="btn">Close</button>
+                </div>
+            </div>
+            
+            <div class="document-preview-meta">
+                <div><strong>Source:</strong> School</div>
+                <div><strong>Category:</strong> Policy</div>
+                <div><strong>Updated:</strong> Mar 15, 2025</div>
+                <div><strong>Version:</strong> 2.1</div>
+            </div>
+            
+            <div class="document-preview-content">
+                <h1 style="text-align: center; color: var(--dark-green);">Environment, Health, and Safety Policy Statement</h1>
+                
+                <p style="text-align: center;"><strong>Our School</strong> is committed to providing a safe and healthy environment for all students, staff, and visitors. We recognize that the well-being of our school community is essential to achieving our educational mission.</p>
+                
+                <h2>Policy Statement</h2>
+                
+                <p>Our school is committed to:</p>
+                
+                <ul>
+                    <li>Complying with all applicable ADEK, MOE, and UAE health, safety, and environmental regulations</li>
+                    <li>Preventing injuries, illnesses, and environmental impacts through proactive risk management</li>
+                    <li>Continuously improving our EHS performance through regular reviews and updates</li>
+                    <li>Providing adequate resources to implement and maintain effective EHS programs</li>
+                    <li>Promoting a culture of safety awareness and responsibility among all members of our school community</li>
+                </ul>
+                
+                <h2>Responsibilities</h2>
+                
+                <p><strong>School Leadership:</strong></p>
+                <ul>
+                    <li>Establish and maintain an effective EHS management system</li>
+                    <li>Provide necessary resources for EHS programs</li>
+                    <li>Ensure compliance with regulatory requirements</li>
+                    <li>Lead by example in promoting safety culture</li>
+                </ul>
+                
+                <p><strong>Staff and Faculty:</strong></p>
+                <ul>
+                    <li>Follow all EHS policies and procedures</li>
+                    <li>Report hazards, incidents, and near misses promptly</li>
+                    <li>Participate in EHS training and initiatives</li>
+                    <li>Incorporate safety education into teaching where appropriate</li>
+                </ul>
+                
+                <p><strong>Students:</strong></p>
+                <ul>
+                    <li>Follow safety rules and instructions</li>
+                    <li>Report unsafe conditions to teachers or staff</li>
+                    <li>Participate in safety drills and training</li>
+                    <li>Contribute to maintaining a clean and safe environment</li>
+                </ul>
+                
+                <h2>Implementation</h2>
+                
+                <p>This policy will be implemented through:</p>
+                
+                <ul>
+                    <li>Regular risk assessments and safety inspections</li>
+                    <li>Comprehensive EHS training programs</li>
+                    <li>Effective incident reporting and investigation procedures</li>
+                    <li>Emergency preparedness and response planning</li>
+                    <li>Regular review and continuous improvement of EHS performance</li>
+                </ul>
+                
+                <p style="margin-top: 40px;">This policy will be reviewed annually and updated as necessary to ensure its continued relevance and effectiveness.</p>
+                
+                <div style="margin-top: 40px;">
+                    <p><strong>Approved by:</strong> School Principal</p>
+                    <p><strong>Date:</strong> March 15, 2025</p>
+                </div>
+            </div>
+            
+            <div class="document-preview-footer">
+                <div class="document-preview-pagination">
+                    <div class="document-preview-page">1</div>
+                    <div class="document-preview-page active">2</div>
+                    <div class="document-preview-page">3</div>
+                    <div class="document-preview-page">4</div>
+                </div>
+                
+                <div class="document-preview-zoom">
+                    <div class="document-preview-zoom-btn">-</div>
+                    <div class="document-preview-zoom-level">100%</div>
+                    <div class="document-preview-zoom-btn">+</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Document Upload (Hidden by default, would be shown when upload is selected) -->
+    <div style="display: none;">
+        <div class="card">
+            <div class="card-header">
+                Upload Document
+            </div>
+            <div class="card-body">
+                <div class="form-group">
+                    <label class="form-label">Document Title</label>
+                    <input type="text" class="form-control" placeholder="Enter document title">
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label class="form-label">Category</label>
+                            <select class="form-select">
+                                <option>Select category</option>
+                                <option>Health</option>
+                                <option>Safety</option>
+                                <option>Environment</option>
+                                <option>Emergency</option>
+                                <option>Facilities</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label class="form-label">Document Type</label>
+                            <select class="form-select">
+                                <option>Select type</option>
+                                <option>Policy</option>
+                                <option>Procedure</option>
+                                <option>Guideline</option>
+                                <option>Form</option>
+                                <option>Checklist</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label class="form-label">Source</label>
+                            <select class="form-select">
+                                <option>Select source</option>
+                                <option>ADEK</option>
+                                <option>MOE</option>
+                                <option>School</option>
+                                <option>External</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label class="form-label">Department</label>
+                            <select class="form-select">
+                                <option>Select department</option>
+                                <option>Administration</option>
+                                <option>Teaching Staff</option>
+                                <option>Facilities</option>
+                                <option>Housekeeping</option>
+                                <option>Canteen</option>
+                                <option>Clinic</option>
+                                <option>Security</option>
+                                <option>Transportation</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Description</label>
+                    <textarea class="form-textarea" placeholder="Enter document description"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Version</label>
+                    <input type="text" class="form-control" placeholder="e.g., 1.0">
+                </div>
+                
+                <div class="document-upload">
+                    <div class="document-upload-dropzone">
+                        <div class="document-upload-icon">📄</div>
+                        <div class="document-upload-text">Drag and drop files here</div>
+                        <div class="document-upload-subtext">or click to browse your computer</div>
+                    </div>
+                    
+                    <div class="document-upload-progress">
+                        <div class="document-upload-progress-bar">
+                            <div class="document-upload-progress-fill"></div>
+                        </div>
+                        <div class="document-upload-progress-text">
+                            <div>Uploading...</div>
+                            <div>75%</div>
+                        </div>
+                    </div>
+                    
+                    <div class="document-upload-files">
+                        <div class="document-upload-file">
+                            <div class="document-upload-file-info">
+                                <div class="document-upload-file-icon">📄</div>
+                                <div class="document-upload-file-name">EHS_Policy_Draft.pdf (2.5 MB)</div>
+                            </div>
+                            <div class="document-upload-file-actions">
+                                <div class="document-upload-file-action">❌</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <button class="btn btn-secondary">Cancel</button>
+                    <button class="btn">Upload Document</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

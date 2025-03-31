@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EHS App - Document Repository</title>
+    <style>
+        :root {
+            --primary-green: #2E8B57;
+            --light-green: #8FBC8F;
+            --dark-green: #006400;
+            --white: #FFFFFF;
+            --light-gray: #F5F5F5;
+            --dark-gray: #333333;
+            --warning-yellow: #FFD700;
+            --danger-red: #DC3545;
+            --info-blue: #17A2B8;
+        }
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--light-gray);
+            color: var(--dark-gray);
+        }
+        
+        .layout {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        .sidebar {
+            width: 250px;
+            background-color: var(--dark-green);
+            color: var(--white);
+            padding: 0;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+        }
+        
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--primary-green);
+        }
+        
+        .sidebar-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .sidebar-menu li {
+            padding: 0;
+        }
+        
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            color: var(--white);
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+        
+        .sidebar-menu a:hover, .sidebar-menu a.active {
+            background-color: var(--primary-green);
+        }
+        
+        .sidebar-menu .icon {
+            margin-right: 10px;
+            width: 20px;
+            height: 20px;
+            background-color: var(--white);
+            border-radius: 50%;
+        }
+        
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            margin-top: 60px;
+        }
+        
+        .topbar {
+            position: fixed;
+            top: 0;
+            right: 0;
+            left: 250px;
+            height: 60px;
+            background-color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            z-index: 100;
+        }
+        
+        .topbar-left {
+            display: flex;
+            align-items: center;
+        }
+        
+        .topbar-right {
+            display: flex;
+            align-items: center;
+        }
+        
+        .notification-icon {
+            margin-right: 20px;
+            position: relative;
+        }
+        
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            width: 10px;
+            height: 10px;
+            background-color: var(--danger-red);
+            border-radius: 50%;
+        }
+        
+        .user-profile {
+            display: flex;
+            align-items: center;
+        }
+        
+        .avatar {
+            width: 32px;
+            height: 32px;
+            background-color: var(--primary-green);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        
+        .user-info {
+            line-height: 1.2;
+        }
+        
+        .user-name {
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        
+        .user-role {
+            font-size: 0.8rem;
+            color: #666;
+        }
+        
+        .page-header {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .page-title {
+            margin: 0;
+            color: var(--dark-green);
+            font-size: 1.8rem;
+        }
+        
+        .page-subtitle {
+            margin: 5px 0 0;
+            color: #666;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: var(--primary-green);
+            color: var(--white);
+            border: none;
+            border-radius: 4px;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+        
+        .btn:hover {
+            background-color: var(--dark-green);
+        }
+        
+        .btn-secondary {
+            background-color: var(--white);
+            color: var(--primary-green);
+            border: 1px solid var(--primary-green);
+        }
+        
+        .btn-secondary:hover {
+            background-color: var(--light-green);
+            color: var(--dark-green);
+        }
+        
+        .search-bar {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        
+        .search-input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px 0 0 4px;
+            font-size: 1rem;
+        }
+        
+        .search-btn {
+            padding: 10px 20px;
+            background-color: var(--primary-green);
+            color: var(--white);
+            border: none;
+            border-radius: 0 4px 4px 0;
+            cursor: pointer;
+        }
+        
+        .filters {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .filter-select {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: var(--white);
+        }
+        
+        .document-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        
+        .document-card {
+            background-color: var(--white);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .document-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .document-icon {
+            height: 120px;
+            background-color: var(--light-green);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+        }
+        
+        .document-content {
+            padding: 15px;
+        }
+        
+        .document-title {
+            margin: 0 0 5px;
+            font-weight: 600;
+            color: var(--dark-green);
+        }
+        
+        .document-meta {
+            font-size: 0.8rem;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        
+        .document-actions {
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .document-action {
+            color: var(--primary-green);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        
+        .document-action:hover {
+            color: var(--dark-green);
+            text-decoration: underline;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-right: 5px;
+        }
+        
+        .badge-policy {
+            background-color: #d1e7dd;
+            color: #0f5132;
+        }
+        
+        .badge-procedure {
+            background-color: #cfe2ff;
+            color: #084298;
+        }
+        
+        .badge-form {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        
+        .badge-guideline {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 30px;
+        }
+        
+        .pagination-item {
+            display: inline-block;
+            padding: 8px 12px;
+            margin: 0 5px;
+            border-radius: 4px;
+            background-color: var(--white);
+            color: var(--dark-gray);
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+        
+        .pagination-item:hover, .pagination-item.active {
+            background-color: var(--primary-green);
+            color: var(--white);
+        }
+    </style>
+</head>
+<body>
+    <div class="layout">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2>EHS App</h2>
+            </div>
+            <ul class="sidebar-menu">
+                <li><a href="#">
+                    <span class="icon">📊</span>
+                    Dashboard
+                </a></li>
+                <li><a href="#">
+                    <span class="icon">⚠️</span>
+                    Incident Reporting
+                </a></li>
+                <li><a href="#">
+                    <span class="icon">🔧</span>
+                    Maintenance Requests
+                </a></li>
+                <li><a href="#">
+                    <span class="icon">📋</span>
+                    Audits & Inspections
+                </a></li>
+                <li><a href="#" class="active">
+                    <span class="icon">📑</span>
+                    Document Repository
+                </a></li>
+                <li><a href="#">
+                    <span class="icon">🎓</span>
+                    Training Materials
+                </a></li>
+                <li><a href="#">
+                    <span class="icon">🧹</span>
+                    Housekeeping
+                </a></li>
+                <li><a href="#">
+                    <span class="icon">⚙️</span>
+                    Settings
+                </a></li>
+            </ul>
+        </div>
+        
+        <div class="main-content">
+            <div class="topbar">
+                <div class="topbar-left">
+                    <h1 style="margin: 0; color: var(--primary-green);">EHS App</h1>
+                </div>
+                <div class="topbar-right">
+                    <div class="notification-icon">
+                        <span>🔔</span>
+                        <span class="notification-badge"></span>
+                    </div>
+                    <div class="user-profile">
+                        <div class="avatar">US</div>
+                        <div class="user-info">
+                            <div class="user-name">User Name</div>
+                            <div class="user-role">Admin</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title">Document Repository</h1>
+                    <p class="page-subtitle">Access and manage all EHS policies, procedures, and forms</p>
+                </div>
+                <a href="#" class="btn">Upload New Document</a>
+            </div>
+            
+            <div class="search-bar">
+                <input type="text" class="search-input" placeholder="Search documents...">
+                <button class="search-btn">Search</button>
+            </div>
+            
+            <div class="filters">
+                <select class="filter-select">
+                    <option value="">All Categories</option>
+                    <option value="safety">Safety</option>
+                    <option value="health">Health</option>
+                    <option value="environmental">Environmental</option>
+                    <option value="facility">Facility</option>
+                    <option value="general">General</option>
+                </select>
+                
+                <select class="filter-select">
+                    <option value="">All Types</option>
+                    <option value="policy">Policy</option>
+                    <option value="procedure">Procedure</option>
+                    <option value="guideline">Guideline</option>
+                    <option value="form">Form</option>
+                </select>
+                
+                <select class="filter-select">
+                    <option value="">All Statuses</option>
+                    <option value="approved">Approved</option>
+                    <option value="draft">Draft</option>
+                    <option value="review">Under Review</option>
+                    <option value="archived">Archived</option>
+                </select>
+            </div>
+            
+            <div class="document-grid">
+                <div class="document-card">
+                    <div class="document-icon">📄</div>
+                    <div class="document-content">
+                        <h3 class="document-title">Fire Safety Policy</h3>
+                        <div class="document-meta">
+                            <span class="badge badge-policy">Policy</span>
+                            <span>Updated: Mar 29, 2025</span>
+                        </div>
+                        <p>Comprehensive fire safety guidelines for all school facilities.</p>
+                        <div class="document-actions">
+                            <a href="#" class="document-action">View</a>
+                            <a href="#" class="document-action">Download</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="document-card">
+                    <div class="document-icon">📄</div>
+                    <div class="document-content">
+                        <h3 class="document-title">Chemical Handling Procedure</h3>
+                        <div class="document-meta">
+                            <span class="badge badge-procedure">Procedure</span>
+                            <span>Updated: Mar 24, 2025</span>
+                        </div>
+                        <p>Step-by-step procedures for safe handling of chemicals in laboratories.</p>
+                        <div class="document-actions">
+                            <a href="#" class="document-action">View</a>
+                            <a href="#" class="document-action">Download</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="document-card">
+                    <div class="document-icon">📄</div>
+                    <div class="document-content">
+                        <h3 class="document-title">Incident Report Form</h3>
+                        <div class="document-meta">
+                            <span class="badge badge-form">Form</span>
+                            <span>Updated: Mar 15, 2025</span>
+                        </div>
+                        <p>Standard form for reporting incidents and accidents.</p>
+                        <div class="document-actions">
+                            <a href="#" class="document-action">View</a>
+                            <a href="#" class="document-action">Download</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="document-card">
+                    <div class="document-icon">📄</div>
+                    <div class="document-content">
+                        <h3 class="document-title">Emergency Response Plan</h3>
+                        <div class="document-meta">
+                            <span class="badge badge-guideline">Guideline</span>
+                            <span>Updated: Mar 10, 2025</span>
+                        </div>
+                        <p>Comprehensive emergency response procedures for various scenarios.</p>
+                        <div class="document-actions">
+                            <a href="#" class="document-action">View</a>
+                            <a href="#" class="document-action">Download</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="document-card">
+                    <div class="document-icon">📄</div>
+                    <div class="document-content">
+                        <h3 class="document-title">First Aid Guidelines</h3>
+                        <div class="document-meta">
+                            <span class="badge badge-guideline">Guideline</span>
+                            <span>Updated: Mar 5, 2025</span>
+                        </div>
+                        <p>Basic first aid procedures for common injuries and emergencies.</p>
+                        <div class="document-actions">
+                            <a href="#" class="document-action">View</a>
+                            <a href="#" class="document-action">Download</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="document-card">
+                    <div class="document-icon">📄</div>
+                    <div class="document-content">
+                        <h3 class="document-title">Waste Management Policy</h3>
+                        <div class="document-meta">
+                            <span class="badge badge-policy">Policy</span>
+                            <span>Updated: Feb 28, 2025</span>
+                        </div>
+                        <p>Guidelines for proper waste segregation, disposal, and recycling.</p>
+                        <div class="document-actions">
+                            <a href="#" class="document-action">View</a>
+                            <a href="#" class="document-action">Download</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="document-card">
+                    <div class="document-icon">📄</div>
+                    <div class="document-content">
+                        <h3 class="document-title">Facility Inspection Checklist</h3>
+                        <div class="document-meta">
+                            <span class="badge badge-form">Form</span>
+                            <span>Updated: Feb 20, 2025</span>
+                        </div>
+                        <p>Comprehensive checklist for regular facility safety inspections.</p>
+                        <div class="document-actions">
+                            <a href="#" class="document-action">View</a>
+                            <a href="#" class="document-action">Download</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="document-card">
+                    <div class="document-icon">📄</div>
+                    <div class="document-content">
+                        <h3 class="document-title">ADEK Compliance Guide</h3>
+                        <div class="document-meta">
+                            <span class="badge badge-guideline">Guideline</span>
+                            <span>Updated: Feb 15, 2025</span>
+                        </div>
+                        <p>Guidelines for ensuring compliance with ADEK health and safety requirements.</p>
+                        <div class="document-actions">
+                            <a href="#" class="document-action">View</a>
+                            <a href="#" class="document-action">Download</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="pagination">
+                <a href="#" class="pagination-item active">1</a>
+                <a href="#" class="pagination-item">2</a>
+                <a href="#" class="pagination-item">3</a>
+                <a href="#" class="pagination-item">Next</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

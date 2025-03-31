@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EHS App - Incident Reporting</title>
+    <style>
+        :root {
+            --primary-green: #2E8B57;
+            --light-green: #8FBC8F;
+            --dark-green: #006400;
+            --white: #FFFFFF;
+            --light-gray: #F5F5F5;
+            --dark-gray: #333333;
+            --warning-yellow: #FFD700;
+            --danger-red: #DC3545;
+            --info-blue: #17A2B8;
+        }
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--light-gray);
+            color: var(--dark-gray);
+        }
+        
+        .layout {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        .sidebar {
+            width: 250px;
+            background-color: var(--dark-green);
+            color: var(--white);
+            padding: 0;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+        }
+        
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--primary-green);
+        }
+        
+        .sidebar-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .sidebar-menu li {
+            padding: 0;
+        }
+        
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            color: var(--white);
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+        
+        .sidebar-menu a:hover, .sidebar-menu a.active {
+            background-color: var(--primary-green);
+        }
+        
+        .sidebar-menu .icon {
+            margin-right: 10px;
+            width: 20px;
+            height: 20px;
+            background-color: var(--white);
+            border-radius: 50%;
+        }
+        
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            margin-top: 60px;
+        }
+        
+        .topbar {
+            position: fixed;
+            top: 0;
+            right: 0;
+            left: 250px;
+            height: 60px;
+            background-color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            z-index: 100;
+        }
+        
+        .topbar-left {
+            display: flex;
+            align-items: center;
+        }
+        
+        .topbar-right {
+            display: flex;
+            align-items: center;
+        }
+        
+        .notification-icon {
+            margin-right: 20px;
+            position: relative;
+        }
+        
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            width: 10px;
+            height: 10px;
+            background-color: var(--danger-red);
+            border-radius: 50%;
+        }
+        
+        .user-profile {
+            display: flex;
+            align-items: center;
+        }
+        
+        .avatar {
+            width: 32px;
+            height: 32px;
+            background-color: var(--primary-green);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        
+        .user-info {
+            line-height: 1.2;
+        }
+        
+        .user-name {
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        
+        .user-role {
+            font-size: 0.8rem;
+            color: #666;
+        }
+        
+        .page-header {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .page-title {
+            margin: 0;
+            color: var(--dark-green);
+            font-size: 1.8rem;
+        }
+        
+        .page-subtitle {
+            margin: 5px 0 0;
+            color: #666;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: var(--primary-green);
+            color: var(--white);
+            border: none;
+            border-radius: 4px;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+        
+        .btn:hover {
+            background-color: var(--dark-green);
+        }
+        
+        .btn-secondary {
+            background-color: var(--white);
+            color: var(--primary-green);
+            border: 1px solid var(--primary-green);
+        }
+        
+        .btn-secondary:hover {
+            background-color: var(--light-green);
+            color: var(--dark-green);
+        }
+        
+        .card {
+            background-color: var(--white);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .card-header {
+            background-color: var(--primary-green);
+            color: var(--white);
+            padding: 15px 20px;
+            font-weight: bold;
+        }
+        
+        .card-body {
+            padding: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-green);
+            box-shadow: 0 0 0 2px rgba(46, 139, 87, 0.25);
+        }
+        
+        .form-select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            background-color: var(--white);
+        }
+        
+        .form-textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .form-row {
+            display: flex;
+            margin-left: -10px;
+            margin-right: -10px;
+        }
+        
+        .form-col {
+            flex: 1;
+            padding-left: 10px;
+            padding-right: 10px;
+        }
+        
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .file-upload {
+            border: 2px dashed #ddd;
+            padding: 20px;
+            text-align: center;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: border-color 0.3s;
+        }
+        
+        .file-upload:hover {
+            border-color: var(--primary-green);
+        }
+        
+        .file-upload-icon {
+            font-size: 2rem;
+            color: var(--primary-green);
+            margin-bottom: 10px;
+        }
+        
+        .file-upload-text {
+            color: #666;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .badge-warning {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        
+        .badge-success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .badge-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <div class="layout">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2>EHS App</h2>
+            </div>
+            <ul class="sidebar-menu">
+                <li><a href="#">
+                    <span class="icon">📊</span>
+                    Dashboard
+                </a></li>
+                <li><a href="#" class="active">
+                    <span class="icon">⚠️</span>
+                    Incident Reporting
+                </a></li>
+                <li><a href="#">
+                    <span class="icon">🔧</span>
+                    Maintenance Requests
+                </a></li>
+                <li><a href="#">
+                    <span class="icon">📋</span>
+                    Audits & Inspections
+                </a></li>
+                <li><a href="#">
+                    <span class="icon">📑</span>
+                    Document Repository
+                </a></li>
+                <li><a href="#">
+                    <span class="icon">🎓</span>
+                    Training Materials
+                </a></li>
+                <li><a href="#">
+                    <span class="icon">🧹</span>
+                    Housekeeping
+                </a></li>
+                <li><a href="#">
+                    <span class="icon">⚙️</span>
+                    Settings
+                </a></li>
+            </ul>
+        </div>
+        
+        <div class="main-content">
+            <div class="topbar">
+                <div class="topbar-left">
+                    <h1 style="margin: 0; color: var(--primary-green);">EHS App</h1>
+                </div>
+                <div class="topbar-right">
+                    <div class="notification-icon">
+                        <span>🔔</span>
+                        <span class="notification-badge"></span>
+                    </div>
+                    <div class="user-profile">
+                        <div class="avatar">US</div>
+                        <div class="user-info">
+                            <div class="user-name">User Name</div>
+                            <div class="user-role">Admin</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title">Report New Incident</h1>
+                    <p class="page-subtitle">Fill out the form below to report a new incident</p>
+                </div>
+                <a href="#" class="btn btn-secondary">Back to Incidents</a>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    Incident Details
+                </div>
+                <div class="card-body">
+                    <form>
+                        <div class="form-row">
+                            <div class="form-col">
+                                <div class="form-group">
+                                    <label class="form-label" for="incident-title">Incident Title*</label>
+                                    <input type="text" id="incident-title" class="form-control" placeholder="Enter a brief title for the incident" required>
+                                </div>
+                            </div>
+                            <div class="form-col">
+                                <div class="form-group">
+                                    <label class="form-label" for="incident-date">Date and Time of Incident*</label>
+                                    <input type="datetime-local" id="incident-date" class="form-control" required>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-col">
+                                <div class="form-group">
+                                    <label class="form-label" for="incident-type">Incident Type*</label>
+                                    <select id="incident-type" class="form-select" required>
+                                        <option value="">Select incident type</option>
+                                        <option value="injury">Injury</option>
+                                        <option value="near_miss">Near Miss</option>
+                                        <option value="property_damage">Property Damage</option>
+                                        <option value="environmental">Environmental</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-col">
+                                <div class="form-group">
+                                    <label class="form-label" for="severity-level">Severity Level*</label>
+                                    <select id="severity-level" class="form-select" required>
+                                        <option value="">Select severity level</option>
+                                        <option value="low">Low</option>
+                                        <option value="medium">Medium</option>
+                                        <option value="high">High</option>
+                                        <option value="critical">Critical</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="incident-location">Location*</label>
+                            <input type="text" id="incident-location" class="form-control" placeholder="Enter the location where the incident occurred" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="incident-description">Description*</label>
+                            <textarea id="incident-description" class="form-textarea" placeholder="Provide a detailed description of the incident" required></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Attachments</label>
+                            <div class="file-upload">
+                                <div class="file-upload-icon">📁</div>
+                                <div class="file-upload-text">Drag and drop files here or click to browse</div>
+                                <input type="file" style="display: none;" multiple>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">
+                                <input type="checkbox" id="reportable">
+                                This incident is reportable to authorities
+                            </label>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary">Cancel</button>
+                            <button type="submit" class="btn">Submit Report</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

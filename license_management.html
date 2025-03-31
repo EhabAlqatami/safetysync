@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EHS App - License Management</title>
+    <style>
+        :root {
+            --primary-green: #2E8B57;
+            --light-green: #8FBC8F;
+            --dark-green: #006400;
+            --white: #FFFFFF;
+            --light-gray: #F5F5F5;
+            --dark-gray: #333333;
+            --warning-yellow: #FFD700;
+            --danger-red: #DC3545;
+            --info-blue: #17A2B8;
+        }
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--light-gray);
+            color: var(--dark-gray);
+        }
+        
+        .layout {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        .sidebar {
+            width: 250px;
+            background-color: var(--dark-green);
+            color: var(--white);
+            padding: 0;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+        }
+        
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--primary-green);
+        }
+        
+        .sidebar-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .sidebar-menu li {
+            padding: 0;
+        }
+        
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            color: var(--white);
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+        
+        .sidebar-menu a:hover, .sidebar-menu a.active {
+            background-color: var(--primary-green);
+        }
+        
+        .sidebar-menu .icon {
+            margin-right: 10px;
+            width: 20px;
+            height: 20px;
+            background-color: var(--white);
+            border-radius: 50%;
+        }
+        
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            margin-top: 60px;
+        }
+        
+        .topbar {
+            position: fixed;
+            top: 0;
+            right: 0;
+            left: 250px;
+            height: 60px;
+            background-color: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            z-index: 100;
+        }
+        
+        .topbar-left {
+            display: flex;
+            align-items: center;
+        }
+        
+        .topbar-right {
+            display: flex;
+            align-items: center;
+        }
+        
+        .notification-icon {
+            margin-right: 20px;
+            position: relative;
+        }
+        
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            width: 10px;
+            height: 10px;
+            background-color: var(--danger-red);
+            border-radius: 50%;
+        }
+        
+        .user-profile {
+            display: flex;
+            align-items: center;
+        }
+        
+        .avatar {
+            width: 32px;
+            height: 32px;
+            background-color: var(--primary-green);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        
+        .user-info {
+            line-height: 1.2;
+        }
+        
+        .user-name {
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        
+        .user-role {
+            font-size: 0.8rem;
+            color: #666;
+        }
+        
+        .page-header {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .page-title {
+            margin: 0;
+            color: var(--dark-green);
+            font-size: 1.8rem;
+        }
+        
+        .page-subtitle {
+            margin: 5px 0 0;
+            color: #666;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: var(--primary-green);
+            color: var(--white);
+            border: none;
+            border-radius: 4px;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+        
+        .btn:hover {
+            background-color: var(--dark-green);
+        }
+        
+        .btn-secondary {
+            background-color: var(--white);
+            color: var(--primary-green);
+            border: 1px solid var(--primary-green);
+        }
+        
+        .btn-secondary:hover {
+            background-color: var(--light-green);
+            color: var(--dark-green);
+        }
+        
+        .card {
+            background-color: var(--white);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .card-header {
+            background-color: var(--primary-green);
+            color: var(--white);
+            padding: 15px 20px;
+            font-weight: bold;
+        }
+        
+        .card-body {
+            padding: 20px;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            font-weight: 500;
+        }
+        
+        .tab.active {
+            border-bottom-color: var(--primary-green);
+            color: var(--primary-green);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        
+        .form-select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            background-color: var(--white);
+        }
+        
+        .form-textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .form-row {
+            display: flex;
+            margin-left: -10px;
+            margin-right: -10px;
+        }
+        
+        .form-col {
+            flex: 1;
+            padding-left: 10px;
+            padding-right: 10px;
+        }
+        
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .badge-success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .badge-warning {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        
+        .badge-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        .badge-info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+        }
+        
+        .license-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .license-card {
+            background-color: var(--white);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .license-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .license-card-header {
+            background-color: var(--primary-green);
+            color: var(--white);
+            padding: 15px 20px;
+            font-weight: bold;
+        }
+        
+        .license-card-body {
+            padding: 15px;
+        }
+        
+        .license-card-footer {
+            padding: 10px 15px;
+            background-color: var(--light-gray);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background-color: var(--white);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--primary-green);
+            margin: 10px 0;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="layout">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2>EHS App</h2>
+            </div>
+            <ul class="sidebar-menu">
+                <li><a href="#">
+                    <span class="icon">📊</span>
+                    Dashboard
+                </a></li>
+                <li><a href="#">
+                    <span class="icon">⚠️</span>
+                    Incident Reporting
+                </a></li>
+                <li><a href="#">
+                    <span class="icon">🔧</span>
+                    Maintenance Requests
+                </a></li>
+                <li><a href="#">
+                    <span class="icon">📋</span>
+                    Audits & Inspections
+                </a></li>
+                <li><a href="#">
+                    <span class="icon">⚖️</span>
+                    Risk Assessment
+                </a></li>
+                <li><a href="#">
+                    <span class="icon">📑</span>
+                    Document Repository
+                </a></li>
+                <li><a href="#">
+                    <span class="icon">🎓</span>
+                    Training Materials
+                </a></li>
+                <li><a href="#">
+                    <span class="icon">🧹</span>
+                    Housekeeping
+                </a></li>
+                <li><a href="#" class="active">
+                    <span class="icon">🔑</span>
+                    License Management
+                </a></li>
+                <li><a href="#">
+                    <span class="icon">⚙️</span>
+                    Settings
+                </a></li>
+            </ul>
+        </div>
+        
+        <div class="main-content">
+            <div class="topbar">
+                <div class="topbar-left">
+                    <h1 style="margin: 0; color: var(--primary-green);">EHS App</h1>
+                </div>
+                <div class="topbar-right">
+                    <div class="notification-icon">
+                        <span>🔔</span>
+                        <span class="notification-badge"></span>
+                    </div>
+                    <div class="user-profile">
+                        <div class="avatar">US</div>
+                        <div class="user-info">
+                            <div class="user-name">User Name</div>
+                            <div class="user-role">Super Admin</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title">License Management</h1>
+                    <p class="page-subtitle">Manage and monitor licenses for different schools</p>
+                </div>
+                <a href="#" class="btn">Create New License</a>
+            </div>
+            
+            <div class="stats-container">
+                <div class="stat-card">
+                    <div class="stat-label">Total Licenses</div>
+                    <div class="stat-value">12</div>
+                    <div class="stat-label">Active licenses across all schools</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Active Users</div>
+                    <div class="stat-value">247</div>
+                    <div class="stat-label">Users across all licensed schools</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Expiring Soon</div>
+                    <div class="stat-value">3</div>
+                    <div class="stat-label">Licenses expiring in 30 days</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">License Utilization</div>
+                    <div class="stat-value">82%</div>
+                    <div class="stat-label">Average usage across all licenses</div>
+                </div>
+            </div>
+            
+            <div class="tabs">
+                <div class="tab active">Active Licenses</div>
+                <div class="tab">License Requests</div>
+                <div class="tab">Usage Analytics</div>
+                <div class="tab">Settings</div>
+            </div>
+            
+            <div class="tab-content active">
+                <div class="license-grid">
+                    <div class="license-card">
+                        <div class="license-card-header">
+                            Al Nahda National School
+                        </div>
+                        <div class="license-card-body">
+                            <p><strong>License ID:</strong> LIC-2025-001</p>
+                            <p><strong>Type:</strong> Enterprise</p>
+                            <p><strong>Users:</strong> 50/75 (67%)</p>
+                            <p><strong>Modules:</strong> All Modules</p>
+                            <p><strong>Issued:</strong> Jan 15, 2025</p>
+                            <p><strong>Expires:</strong> Jan 14, 2026</p>
+                            <p><strong>Status:</strong> <span class="badge badge-success">Active</span></p>
+                        </div>
+                        <div class="license-card-footer">
+                            <a href="#" class="btn btn-secondary">Manage</a>
+                            <a href="#" class="btn">Renew</a>
+                        </div>
+                    </div>
+                    
+                    <div class="license-card">
+                        <div class="license-card-header">
+                            Emirates National School
+                        </div>
+                        <div class="license-card-body">
+                            <p><strong>License ID:</strong> LIC-2025-002</p>
+                            <p><strong>Type:</strong> Enterprise</p>
+                            <p><strong>Users:</strong> 68/75 (91%)</p>
+                            <p><strong>Modules:</strong> All Modules</p>
+                            <p><strong>Issued:</strong> Feb 1, 2025</p>
+                            <p><strong>Expires:</strong> Jan 31, 2026</p>
+                            <p><strong>Status:</strong> <span class="badge badge-success">Active</span></p>
+                        </div>
+                        <div class="license-card-footer">
+                            <a href="#" class="btn btn-secondary">Manage</a>
+                            <a href="#" class="btn">Renew</a>
+                        </div>
+                    </div>
+                    
+                    <div class="license-card">
+                        <div class="license-card-header">
+                            Abu Dhabi International School
+                        </div>
+                        <div class="license-card-body">
+                            <p><strong>License ID:</strong> LIC-2025-003</p>
+                            <p><strong>Type:</strong> Standard</p>
+                            <p><strong>Users:</strong> 32/50 (64%)</p>
+                            <p><strong>Modules:</strong> Core + Audit</p>
+                            <p><strong>Issued:</strong> Feb 15, 2025</p>
+                            <p><strong>Expires:</strong> Feb 14, 2026</p>
+                            <p><strong>Status:</strong> <span class="badge badge-success">Active</span></p>
+                        </div>
+                        <div class="license-card-footer">
+                            <a href="#" class="btn btn-secondary">Manage</a>
+                            <a href="#" class="btn">Renew</a>
+                        </div>
+                    </div>
+                    
+                    <div class="license-card">
+                        <div class="license-card-header">
+                            Al Bateen Academy
+                        </div>
+                        <div class="license-card-body">
+                            <p><strong>License ID:</strong> LIC-2025-004</p>
+                            <p><strong>Type:</strong> Standard</p>
+                            <p><strong>Users:</strong> 28/50 (56%)</p>
+                            <p><strong>Modules:</strong> Core + Risk</p>
+                            <p><strong>Issued:</strong> Mar 1, 2025</p>
+                            <p><strong>Expires:</strong> Apr 30, 2025</p>
+                            <p><strong>Status:</strong> <span class="badge badge-warning">Expiring Soon</span></p>
+                        </div>
+                        <div class="license-card-footer">
+                            <a href="#" class="btn btn-secondary">Manage</a>
+                            <a href="#" class="btn">Renew</a>
+                        </div>
+                    </div>
+                    
+                    <div class="license-card">
+                        <div class="license-card-header">
+                            Raha International School
+                        </div>
+                        <div class="license-card-body">
+                            <p><strong>License ID:</strong> LIC-2025-005</p>
+                            <p><strong>Type:</strong> Enterprise</p>
+                            <p><strong>Users:</strong> 62/75 (83%)</p>
+                            <p><strong>Modules:</strong> All Modules</p>
+                            <p><strong>Issued:</strong> Mar 15, 2025</p>
+                            <p><strong>Expires:</strong> Mar 14, 2026</p>
+                            <p><strong>Status:</strong> <span class="badge badge-success">Active</span></p>
+                        </div>
+                        <div class="license-card-footer">
+                            <a href="#" class="btn btn-secondary">Manage</a>
+                            <a href="#" class="btn">Renew</a>
+                        </div>
+                    </div>
+                    
+                    <div class="license-card">
+                        <div class="license-card-header">
+                            Brighton College Abu Dhabi
+                        </div>
+                        <div class="license-card-body">
+                            <p><strong>License ID:</strong> LIC-2025-006</p>
+                            <p><strong>Type:</strong> Basic</p>
+                            <p><strong>Users:</strong> 7/25 (28%)</p>
+                            <p><strong>Modules:</strong> Core Only</p>
+                            <p><strong>Issued:</strong> Apr 1, 2025</p>
+                            <p><strong>Expires:</strong> May 15, 2025</p>
+                            <p><strong>Status:</strong> <span class="badge badge-warning">Expiring Soon</span></p>
+                        </div>
+                        <div class="license-card-footer">
+                            <a href="#" class="btn btn-secondary">Manage</a>
+                            <a href="#" class="btn">Renew</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        New License Request
+                    </div>
+                    <div class="card-body">
+                        <form>
+                            <div class="form-row">
+                                <div class="form-col">
+                                    <div class="form-group">
+                                        <label class="form-label" for="school-name">School Name*</label>
+                                        <input type="text" id="school-name" class="form-control" placeholder="Enter school name" required>
+                                    </div>
+                                </div>
+                                <div class="form-col">
+                                    <div class="form-group">
+                                        <label class="form-label" for="license-type">License Type*</label>
+                                        <select id="license-type" class="form-select" required>
+                                            <option value="">Select license type</option>
+                                            <option value="basic">Basic (Core modules, 25 users)</option>
+                                            <option value="standard">Standard (Core + 1 add-on, 50 users)</option>
+                                            <option value="enterprise">Enterprise (All modules, 75 users)</option>
+                                            <option value="custom">Custom</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-col">
+                                    <div class="form-group">
+                                        <label class="form-label" for="contact-name">Contact Person*</label>
+                                        <input type="text" id="contact-name" class="form-control" placeholder="Enter contact person name" required>
+                                    </div>
+                                </div>
+                                <div class="form-col">
+                                    <div class="form-group">
+                                        <label class="form-label" for="contact-email">Contact Email*</label>
+                                        <input type="email" id="contact-email" class="form-control" placeholder="Enter contact email" required>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-col">
+                                    <div class="form-group">
+                                        <label class="form-label" for="start-date">Start Date*</label>
+                                        <input type="date" id="start-date" class="form-control" required>
+                                    </div>
+                                </div>
+                                <div class="form-col">
+                                    <div class="form-group">
+                                        <label class="form-label" for="duration">Duration*</label>
+                                        <select id="duration" class="form-select" required>
+                                            <option value="">Select duration</option>
+                                            <option value="3">3 months</option>
+                                            <option value="6">6 months</option>
+                                            <option value="12">1 year</option>
+                                            <option value="24">2 years</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Modules</label>
+                                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
+                                    <div>
+                                        <label>
+                                            <input type="checkbox" checked disabled> Incident Reporting
+                                        </label>
+                                    </div>
+                                    <div>
+                                        <label>
+                                            <input type="checkbox" checked disabled> Maintenance Requests
+                                        </label>
+                                    </div>
+                                    <div>
+                                        <label>
+                                            <input type="checkbox"> Audits & Inspections
+                                        </label>
+                                    </div>
+                                    <div>
+                                        <label>
+                                            <input type="checkbox"> Risk Assessment
+                                        </label>
+                                    </div>
+                                    <div>
+                                        <label>
+                                            <input type="checkbox"> Document Repository
+                                        </label>
+                                    </div>
+                                    <div>
+                                        <label>
+                                            <input type="checkbox"> Training Materials
+                                        </label>
+                                    </div>
+                                    <div>
+                                        <label>
+                                            <input type="checkbox"> Housekeeping
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="notes">Additional Notes</label>
+                                <textarea id="notes" class="form-textarea" placeholder="Enter any additional information or special requirements"></textarea>
+                            </div>
+                            
+                            <div class="form-actions">
+                                <button type="button" class="btn btn-secondary">Cancel</button>
+                                <button type="submit" class="btn">Create License</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        License Usage Analytics
+                    </div>
+                    <div class="card-body">
+                        <div style="margin-bottom: 30px;">
+                            <h3 style="margin-top: 0;">User Activity by School</h3>
+                            <div style="height: 300px; background-color: #f8f9fa; border-radius: 4px; display: flex; align-items: center; justify-content: center;">
+                                <p style="color: #666;">Bar Chart: User Activity Visualization</p>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-bottom: 30px;">
+                            <h3 style="margin-top: 0;">Module Usage Distribution</h3>
+                            <div style="height: 300px; background-color: #f8f9fa; border-radius: 4px; display: flex; align-items: center; justify-content: center;">
+                                <p style="color: #666;">Pie Chart: Module Usage Distribution</p>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h3 style="margin-top: 0;">License Utilization Trends</h3>
+                            <div style="height: 300px; background-color: #f8f9fa; border-radius: 4px; display: flex; align-items: center; justify-content: center;">
+                                <p style="color: #666;">Line Chart: License Utilization Over Time</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
