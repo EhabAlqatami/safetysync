@@ -143,16 +143,16 @@ function showAuthenticatedUI(user) {
 }
 
 function showLoginUI() {
-    document.getElementById('loginSection').style.display = 'block';
-    document.getElementById('dashboardSection').style.display = 'none';
-}
-
-function showLoginError(message) {
-    const errorElement = document.getElementById('loginError');
-    if (errorElement) {
-        errorElement.textContent = message;
-        errorElement.style.display = 'block';
-    }
+  const loginSection = document.getElementById('loginSection');
+  const dashboardSection = document.getElementById('dashboardSection');
+  
+  if (loginSection) {
+    loginSection.style.display = 'block';
+  }
+  
+  if (dashboardSection) {
+    dashboardSection.style.display = 'none';
+  }
 }
 
 function showSuccessMessage(message) {
