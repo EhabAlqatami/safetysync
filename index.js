@@ -1,117 +1,62 @@
 const express = require('express');
 const path = require('path');
-const bodyParser = require('body-parser');
-const fs = require('fs');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, '/')));
+// Serve static files from the root directory
+app.use(express.static(path.join(__dirname)));
 
-// In-memory storage (replace with database in production)
-const users = [
-    { id: 1, username: 'admin', password: 'admin123', name: 'Admin User', role: 'admin' },
-    { id: 2, username: 'user', password: 'user123', name: 'Regular User', role: 'user' }
-];
+// Simple API endpoint for testing
+app.get('/api/test', (req, res) => {
+    res.json({ message: 'API is working!' });
+});
 
-const incidents = [];
-const inspections = [];
-
-// API Routes
-// Auth endpoints
-app.post('/api/auth/login', (req, res) => {
-    const { username, password } = req.body;
+// Serve the main HTML file for all routes
+app.get('*', (req, res) => {
+    // Try to serve the requested path
+    const requestedPath = req.path.substring(1); // Remove leading slash
     
-    const user = users.find(u => u.username === username && u.password === password);
-    
-    if (user) {
-        // In a real app, you would set up sessions or JWT here
-        const userInfo = { ...user };
-        delete userInfo.password; // Don't send password to client
-        
-        res.json({
-            success: true,
-            user: userInfo
+    if (requestedPath && requestedPath.endsWith('.html')) {
+        // If it's an HTML file request, try to serve it
+        const filePath = path.join(__dirname, requestedPath);
+        res.sendFile(filePath, (err) => {
+            if (err) {
+                // If file not found, fall back to index.html or dashboard.html
+                serveDefaultPage(res);
+            }
         });
     } else {
-        res.json({
-            success: false,
-            message: 'Invalid username or password'
-        });
+        // For all other routes, serve a default page
+        serveDefaultPage(res);
     }
 });
 
-app.get('/api/auth/status', (req, res) => {
-    // In a real app, you would check session or JWT here
-    res.json({
-        authenticated: false
-    });
-});
-
-// Incident reporting endpoints
-app.post('/api/incidents/report', (req, res) => {
-    const newIncident = {
-        id: incidents.length + 1,
-        timestamp: new Date(),
-        ...req.body
-    };
+// Helper function to serve a default page
+function serveDefaultPage(res) {
+    const possibleFiles = ['dashboard.html', 'index.html', 'authentication.html'];
     
-    incidents.push(newIncident);
-    
-    res.json({
-        success: true,
-        incident: newIncident
-    });
-});
-
-app.get('/api/incidents', (req, res) => {
-    res.json(incidents);
-});
-
-// Inspection endpoints
-app.post('/api/inspections', (req, res) => {
-    const newInspection = {
-        id: inspections.length + 1,
-        timestamp: new Date(),
-        ...req.body
-    };
-    
-    inspections.push(newInspection);
-    
-    res.json({
-        success: true,
-        inspection: newInspection
-    });
-});
-
-app.get('/api/inspections', (req, res) => {
-    res.json(inspections);
-});
-
-// Route for home page - try multiple possible HTML files
-app.get('/', (req, res) => {
-    const possibleFiles = ['index.html', 'dashboard.html', 'authentication.html'];
-    
+    // Try each possible file
+    let fileFound = false;
     for (const file of possibleFiles) {
         const filePath = path.join(__dirname, file);
-        if (fs.existsSync(filePath)) {
-            console.log(`Serving ${file} as homepage`);
-            return res.sendFile(filePath);
+        try {
+            if (require('fs').existsSync(filePath)) {
+                res.sendFile(filePath);
+                fileFound = true;
+                break;
+            }
+        } catch (err) {
+            console.error(`Error checking for ${file}:`, err);
         }
     }
     
-    // Fallback if no HTML files found
-    res.send('Welcome to SafetySync EHS App! Site is under construction. No HTML files found.');
-});
+    // If no file was found, send a simple message
+    if (!fileFound) {
+        res.send('Welcome to SafetySync EHS App! No default HTML files found.');
+    }
+}
 
-// Catch-all route to handle SPA routing
-app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
-});
-
-// Start server
+// Start the server
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
     console.log(`Current directory: ${__dirname}`);
