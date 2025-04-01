@@ -1,79 +1,209 @@
-/**
- * EHS App Dashboard Statistics Fix
- * 
- * This script adds click functionality to the dashboard statistics cards
- * in the SafetySync EHS application. It makes the statistics cards interactive
- * by adding click event handlers, cursor styling, and hover effects.
- * 
- * Problem: Dashboard statistics cards (Open Incidents, Maintenance Requests, etc.)
- * were not clickable, preventing users from interacting with them.
- * 
- * Solution: Add event listeners to make the cards clickable and navigate to
- * appropriate sections when clicked, plus visual feedback for better UX.
- */
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EHS App - Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Sidebar Navigation -->
+    <div class="sidebar">
+        <h1>EHS App</h1>
+        <nav>
+            <a href="#" class="active"><i class="icon dashboard-icon"></i> Dashboard</a>
+            <a href="incident-reporting.html"><i class="icon incident-icon"></i> Incident Reporting</a>
+            <a href="maintenance-requests.html"><i class="icon maintenance-icon"></i> Maintenance Requests</a>
+            <a href="audits-inspections.html"><i class="icon audit-icon"></i> Audits & Inspections</a>
+            <a href="document-repository.html"><i class="icon document-icon"></i> Document Repository</a>
+            <a href="training-materials.html"><i class="icon training-icon"></i> Training Materials</a>
+            <a href="housekeeping.html"><i class="icon housekeeping-icon"></i> Housekeeping</a>
+            <a href="settings.html"><i class="icon settings-icon"></i> Settings</a>
+        </nav>
+        <div class="user-info">
+            <span id="userInfo">Administrator</span>
+            <button id="logoutBtn" onclick="logout()">Logout</button>
+        </div>
+    </div>
 
-// Function to make dashboard statistics cards interactive
-function makeDashboardStatisticsClickable() {
-  // Get all statistics cards on the dashboard
-  const statCards = document.querySelectorAll('.stat-card');
-  console.log('Making', statCards.length, 'dashboard statistics cards clickable');
+    <!-- Main Content -->
+    <div class="main-content">
+        <header>
+            <h1>Dashboard</h1>
+            <p>Welcome to your EHS dashboard</p>
+        </header>
 
-  // Add click event listeners to each statistics card
-  statCards.forEach((card) => {
-    // Get the title/category of this statistics card
-    const cardTitle = card.querySelector('h3') ? card.querySelector('h3').textContent.trim() : '';
-    const cardText = card.textContent.toLowerCase();
-    
-    // Add the click event listener
-    card.addEventListener('click', function() {
-      // Determine which section to navigate to based on the card content
-      if (cardText.includes('incident')) {
-        console.log('Navigating to Incident Reporting section');
-        window.location.href = 'incident-reporting.html';
-      } 
-      else if (cardText.includes('maintenance')) {
-        console.log('Navigating to Maintenance Requests section');
-        window.location.href = 'maintenance-requests.html';
-      }
-      else if (cardText.includes('audit')) {
-        console.log('Navigating to Audits & Inspections section');
-        window.location.href = 'audits-inspections.html';
-      }
-      else if (cardText.includes('housekeeping')) {
-        console.log('Navigating to Housekeeping section');
-        window.location.href = 'housekeeping.html';
-      }
-      else {
-        console.log('Unknown card type, no navigation target');
-        alert('This feature is coming soon!');
-      }
-    });
-    
-    // Add cursor pointer style to indicate clickability
-    card.style.cursor = 'pointer';
-    
-    // Add hover effect styles
-    card.style.transition = 'transform 0.2s, box-shadow 0.2s';
-    
-    // Add event listeners for hover effects
-    card.addEventListener('mouseenter', function() {
-      this.style.transform = 'translateY(-5px)';
-      this.style.boxShadow = '0 10px 20px rgba(0,0,0,0.1)';
-    });
-    
-    card.addEventListener('mouseleave', function() {
-      this.style.transform = 'translateY(0)';
-      this.style.boxShadow = '0 4px 8px rgba(0,0,0,0.1)';
-    });
-  });
-  
-  console.log('Dashboard statistics cards are now clickable with visual feedback');
-}
+        <!-- Dashboard Statistics -->
+        <div class="statistics-container">
+            <div class="stat-card">
+                <div class="icon-container incident-icon">
+                    <i class="icon large"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>3</h3>
+                    <p>Open Incidents</p>
+                    <span class="trend positive">3% from last month</span>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="icon-container maintenance-icon">
+                    <i class="icon large"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>2</h3>
+                    <p>Maintenance Requests</p>
+                    <span class="trend positive">12% from last month</span>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="icon-container audit-icon">
+                    <i class="icon large"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>5</h3>
+                    <p>Upcoming Audits</p>
+                    <span class="trend negative">20% from last month</span>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="icon-container housekeeping-icon">
+                    <i class="icon large"></i>
+                </div>
+                <div class="stat-content">
+                    <h3>42</h3>
+                    <p>Housekeeping Tasks</p>
+                    <span class="trend positive">8% from last month</span>
+                </div>
+            </div>
+        </div>
 
-// Call the function when the DOM is fully loaded
-document.addEventListener('DOMContentLoaded', makeDashboardStatisticsClickable);
+        <!-- Recent Incidents -->
+        <div class="recent-section">
+            <h2>Recent Incidents</h2>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Title</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="incidentsTableBody">
+                    <tr>
+                        <td>INC-003</td>
+                        <td>Electrical Outage</td>
+                        <td><span class="status critical">Critical</span></td>
+                        <td>Mar 30, 2025</td>
+                        <td><button class="action-btn" data-action="view-details" data-id="INC-003">View</button></td>
+                    </tr>
+                    <tr>
+                        <td>INC-002</td>
+                        <td>Slip and Fall in Hallway</td>
+                        <td><span class="status resolved">Resolved</span></td>
+                        <td>Mar 25, 2025</td>
+                        <td><button class="action-btn" data-action="view-details" data-id="INC-002">View</button></td>
+                    </tr>
+                    <tr>
+                        <td>INC-001</td>
+                        <td>Chemical Spill in Lab</td>
+                        <td><span class="status in-progress">In Progress</span></td>
+                        <td>Mar 28, 2025</td>
+                        <td><button class="action-btn" data-action="view-details" data-id="INC-001">View</button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 
-// If the page is already loaded, run the function immediately
-if (document.readyState === 'complete' || document.readyState === 'interactive') {
-  makeDashboardStatisticsClickable();
-}
+    <!-- Include the app.js file -->
+    <script src="app.js"></script>
+    
+    <!-- Dashboard Statistics Functionality -->
+    <script>
+    /** 
+     * EHS App Dashboard Statistics Fix
+     * 
+     * This script adds click functionality to the dashboard statistics cards
+     * in the SafetySync EHS application. It makes the statistics cards interactive
+     * by adding click event handlers, cursor styling, and hover effects.
+     * 
+     * Problem: Dashboard statistics cards (Open Incidents, Maintenance Requests, etc.)
+     * were not clickable, preventing users from interacting with them.
+     * 
+     * Solution: Add event listeners to make the cards clickable and navigate to
+     * appropriate sections when clicked, plus visual feedback for better UX.
+     */
+    
+    // Function to make dashboard statistics cards interactive
+    function makeDashboardStatisticsClickable() {
+        // Get all statistics cards on the dashboard
+        const statCards = document.querySelectorAll('.stat-card');
+        console.log('Making', statCards.length, 'dashboard statistics cards clickable');
+        
+        // Add click event listeners to each statistics card
+        statCards.forEach((card) => {
+            // Get the title/category of this statistics card
+            const cardTitle = card.querySelector('h3') ? card.querySelector('h3').textContent.trim() : '';
+            const cardText = card.textContent.toLowerCase();
+            
+            // Add the click event listener
+            card.addEventListener('click', function() {
+                // Determine which section to navigate to based on the card content
+                if (cardText.includes('incident')) {
+                    console.log('Navigating to Incident Reporting section');
+                    window.location.href = 'incident-reporting.html';
+                } 
+                else if (cardText.includes('maintenance')) {
+                    console.log('Navigating to Maintenance Requests section');
+                    window.location.href = 'maintenance-requests.html';
+                }
+                else if (cardText.includes('audit')) {
+                    console.log('Navigating to Audits & Inspections section');
+                    window.location.href = 'audits-inspections.html';
+                }
+                else if (cardText.includes('housekeeping')) {
+                    console.log('Navigating to Housekeeping section');
+                    window.location.href = 'housekeeping.html';
+                }
+                else {
+                    console.log('Unknown card type, no navigation target');
+                    alert('This feature is coming soon!');
+                }
+            });
+            
+            // Add cursor pointer style to indicate clickability
+            card.style.cursor = 'pointer';
+            
+            // Add hover effect styles
+            card.style.transition = 'transform 0.2s, box-shadow 0.2s';
+            
+            // Add event listeners for hover effects
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-5px)';
+                this.style.boxShadow = '0 10px 20px rgba(0,0,0,0.1)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+                this.style.boxShadow = '0 4px 8px rgba(0,0,0,0.1)';
+            });
+        });
+        
+        console.log('Dashboard statistics cards are now clickable with visual feedback');
+    }
+    
+    // Call the function when the DOM is fully loaded
+    document.addEventListener('DOMContentLoaded', makeDashboardStatisticsClickable);
+    
+    // If the page is already loaded, run the function immediately
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+        makeDashboardStatisticsClickable();
+    }
+    </script>
+</body>
+</html>
