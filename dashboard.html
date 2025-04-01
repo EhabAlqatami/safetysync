@@ -258,18 +258,130 @@
             background-color: #004d00;
         }
         
-        /* Feature coming soon message */
-        .coming-soon-message {
+        /* Modal styles */
+        .modal {
             display: none;
             position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: rgba(0, 0, 0, 0.8);
-            color: white;
-            padding: 20px;
-            border-radius: 8px;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
             z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 600px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .modal-header h2 {
+            margin: 0;
+            color: #333;
+        }
+        
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+        }
+        
+        .modal-body {
+            margin-bottom: 20px;
+        }
+        
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+        }
+        
+        .modal-footer button {
+            background-color: #006400;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+        
+        .modal-footer button:hover {
+            background-color: #004d00;
+        }
+        
+        /* Tab styles for module content */
+        .tab-container {
+            margin-top: 20px;
+        }
+        
+        .tab-buttons {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+        
+        .tab-button {
+            padding: 10px 20px;
+            background-color: #f5f5f5;
+            border: none;
+            border-bottom: 2px solid transparent;
+            cursor: pointer;
+            margin-right: 5px;
+        }
+        
+        .tab-button.active {
+            border-bottom: 2px solid #006400;
+            background-color: white;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 20px;
+            background-color: white;
+            border-radius: 0 0 8px 8px;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Form styles */
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .form-group textarea {
+            min-height: 100px;
         }
     </style>
 </head>
@@ -278,23 +390,23 @@
     <div class="sidebar">
         <h1>EHS App</h1>
         <nav>
-            <a href="#" class="active"><i class="icon dashboard-icon"></i> Dashboard</a>
-            <a href="#" onclick="showFeatureMessage('Incident Reporting'); return false;"><i class="icon incident-icon"></i> Incident Reporting</a>
-            <a href="#" onclick="showFeatureMessage('Maintenance Requests'); return false;"><i class="icon maintenance-icon"></i> Maintenance Requests</a>
-            <a href="#" onclick="showFeatureMessage('Audits & Inspections'); return false;"><i class="icon audit-icon"></i> Audits & Inspections</a>
-            <a href="#" onclick="showFeatureMessage('Document Repository'); return false;"><i class="icon document-icon"></i> Document Repository</a>
-            <a href="#" onclick="showFeatureMessage('Training Materials'); return false;"><i class="icon training-icon"></i> Training Materials</a>
-            <a href="#" onclick="showFeatureMessage('Housekeeping'); return false;"><i class="icon housekeeping-icon"></i> Housekeeping</a>
-            <a href="#" onclick="showFeatureMessage('Settings'); return false;"><i class="icon settings-icon"></i> Settings</a>
+            <a href="#" class="active" onclick="showDashboard(); return false;"><i class="icon dashboard-icon"></i> Dashboard</a>
+            <a href="#" onclick="showModule('incident'); return false;"><i class="icon incident-icon"></i> Incident Reporting</a>
+            <a href="#" onclick="showModule('maintenance'); return false;"><i class="icon maintenance-icon"></i> Maintenance Requests</a>
+            <a href="#" onclick="showModule('audit'); return false;"><i class="icon audit-icon"></i> Audits & Inspections</a>
+            <a href="#" onclick="showModule('document'); return false;"><i class="icon document-icon"></i> Document Repository</a>
+            <a href="#" onclick="showModule('training'); return false;"><i class="icon training-icon"></i> Training Materials</a>
+            <a href="#" onclick="showModule('housekeeping'); return false;"><i class="icon housekeeping-icon"></i> Housekeeping</a>
+            <a href="#" onclick="showModule('settings'); return false;"><i class="icon settings-icon"></i> Settings</a>
         </nav>
         <div class="user-info">
             <span id="userInfo">Administrator</span>
-            <button id="logoutBtn" onclick="showFeatureMessage('Logout')">Logout</button>
+            <button id="logoutBtn" onclick="showLogoutConfirmation()">Logout</button>
         </div>
     </div>
 
     <!-- Main Content -->
-    <div class="main-content">
+    <div class="main-content" id="dashboardContent">
         <header>
             <h1>Dashboard</h1>
             <p>Welcome to your EHS dashboard</p>
@@ -302,7 +414,7 @@
 
         <!-- Dashboard Statistics -->
         <div class="statistics-container">
-            <div class="stat-card" onclick="showFeatureMessage('Incident Reporting')">
+            <div class="stat-card" onclick="showModule('incident')">
                 <div class="icon-container incident-icon">
                     <i class="icon large"></i>
                 </div>
@@ -313,7 +425,7 @@
                 </div>
             </div>
             
-            <div class="stat-card" onclick="showFeatureMessage('Maintenance Requests')">
+            <div class="stat-card" onclick="showModule('maintenance')">
                 <div class="icon-container maintenance-icon">
                     <i class="icon large"></i>
                 </div>
@@ -324,7 +436,7 @@
                 </div>
             </div>
             
-            <div class="stat-card" onclick="showFeatureMessage('Audits & Inspections')">
+            <div class="stat-card" onclick="showModule('audit')">
                 <div class="icon-container audit-icon">
                     <i class="icon large"></i>
                 </div>
@@ -335,7 +447,7 @@
                 </div>
             </div>
             
-            <div class="stat-card" onclick="showFeatureMessage('Housekeeping')">
+            <div class="stat-card" onclick="showModule('housekeeping')">
                 <div class="icon-container housekeeping-icon">
                     <i class="icon large"></i>
                 </div>
@@ -366,48 +478,443 @@
                         <td>Electrical Outage</td>
                         <td><span class="status critical">Critical</span></td>
                         <td>Mar 30, 2025</td>
-                        <td><button class="action-btn" onclick="showFeatureMessage('Incident Details')">View</button></td>
+                        <td><button class="action-btn" onclick="showIncidentDetails('INC-003', 'Electrical Outage')">View</button></td>
                     </tr>
                     <tr>
                         <td>INC-002</td>
                         <td>Slip and Fall in Hallway</td>
                         <td><span class="status resolved">Resolved</span></td>
                         <td>Mar 25, 2025</td>
-                        <td><button class="action-btn" onclick="showFeatureMessage('Incident Details')">View</button></td>
+                        <td><button class="action-btn" onclick="showIncidentDetails('INC-002', 'Slip and Fall in Hallway')">View</button></td>
                     </tr>
                     <tr>
                         <td>INC-001</td>
                         <td>Chemical Spill in Lab</td>
                         <td><span class="status in-progress">In Progress</span></td>
                         <td>Mar 28, 2025</td>
-                        <td><button class="action-btn" onclick="showFeatureMessage('Incident Details')">View</button></td>
+                        <td><button class="action-btn" onclick="showIncidentDetails('INC-001', 'Chemical Spill in Lab')">View</button></td>
                     </tr>
                 </tbody>
             </table>
         </div>
     </div>
 
-    <!-- Feature Message -->
-    <div id="featureMessage" class="coming-soon-message">
-        <p>The <span id="featureName"></span> feature is coming soon!</p>
+    <!-- Module Content (Hidden by default) -->
+    <div class="main-content" id="moduleContent" style="display: none;">
+        <header>
+            <h1 id="moduleTitle">Module Title</h1>
+            <p id="moduleDescription">Module description goes here</p>
+        </header>
+
+        <div class="tab-container">
+            <div class="tab-buttons">
+                <button class="tab-button active" onclick="showTab('overview')">Overview</button>
+                <button class="tab-button" onclick="showTab('list')">List View</button>
+                <button class="tab-button" onclick="showTab('new')">Create New</button>
+                <button class="tab-button" onclick="showTab('reports')">Reports</button>
+            </div>
+
+            <div class="tab-content active" id="overviewTab">
+                <h2>Overview</h2>
+                <p>This module allows you to manage and track various aspects of your EHS program.</p>
+                <div id="moduleOverviewContent">
+                    <!-- Module-specific content will be inserted here -->
+                </div>
+            </div>
+
+            <div class="tab-content" id="listTab">
+                <h2>List View</h2>
+                <table class="data-table">
+                    <thead id="listTableHead">
+                        <!-- Table headers will be inserted here -->
+                    </thead>
+                    <tbody id="listTableBody">
+                        <!-- Table rows will be inserted here -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="tab-content" id="newTab">
+                <h2>Create New</h2>
+                <form id="newItemForm">
+                    <!-- Form fields will be inserted here -->
+                    <div class="form-group">
+                        <button type="button" onclick="submitForm()">Submit</button>
+                        <button type="button" onclick="resetForm()">Reset</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="tab-content" id="reportsTab">
+                <h2>Reports</h2>
+                <p>Generate reports and analytics for this module.</p>
+                <div id="reportsContent">
+                    <!-- Reports content will be inserted here -->
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- Simple JavaScript - No Authentication or External Dependencies -->
+    <!-- Incident Details Modal -->
+    <div class="modal" id="incidentModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="incidentModalTitle">Incident Details</h2>
+                <button class="close-btn" onclick="closeModal('incidentModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p><strong>ID:</strong> <span id="incidentId"></span></p>
+                <p><strong>Title:</strong> <span id="incidentTitle"></span></p>
+                <p><strong>Description:</strong> This is a detailed description of the incident including what happened, where it occurred, and any immediate actions taken.</p>
+                <p><strong>Status:</strong> <span id="incidentStatus">In Progress</span></p>
+                <p><strong>Date Reported:</strong> <span id="incidentDate">Mar 28, 2025</span></p>
+                <p><strong>Location:</strong> Building A, Room 101</p>
+                <p><strong>Reported By:</strong> John Smith</p>
+                <p><strong>Severity:</strong> Medium</p>
+                <p><strong>Actions Taken:</strong> Initial containment performed, area cordoned off, supervisor notified.</p>
+            </div>
+            <div class="modal-footer">
+                <button onclick="closeModal('incidentModal')">Close</button>
+                <button onclick="updateIncidentStatus()">Update Status</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Logout Confirmation Modal -->
+    <div class="modal" id="logoutModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Confirm Logout</h2>
+                <button class="close-btn" onclick="closeModal('logoutModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to logout?</p>
+            </div>
+            <div class="modal-footer">
+                <button onclick="closeModal('logoutModal')">Cancel</button>
+                <button onclick="logout()">Logout</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript for functionality -->
     <script>
-    // Show feature message
-    function showFeatureMessage(featureName) {
-        const message = document.getElementById('featureMessage');
-        const featureNameElement = document.getElementById('featureName');
-        
-        featureNameElement.textContent = featureName;
-        message.style.display = 'block';
-        
-        setTimeout(function() {
-            message.style.display = 'none';
-        }, 2000);
-        
-        return false;
-    }
+        // Module data
+        const moduleData = {
+            incident: {
+                title: "Incident Reporting",
+                description: "Report and track safety incidents across your organization",
+                overview: "The Incident Reporting module allows you to document, investigate, and track safety incidents. Use this module to ensure proper follow-up and prevent future occurrences.",
+                listHeaders: ["ID", "Title", "Status", "Date", "Location", "Actions"],
+                listItems: [
+                    ["INC-003", "Electrical Outage", "Critical", "Mar 30, 2025", "Building B", "<button class='action-btn' onclick='showIncidentDetails(\"INC-003\", \"Electrical Outage\")'>View</button>"],
+                    ["INC-002", "Slip and Fall in Hallway", "Resolved", "Mar 25, 2025", "Main Hallway", "<button class='action-btn' onclick='showIncidentDetails(\"INC-002\", \"Slip and Fall in Hallway\")'>View</button>"],
+                    ["INC-001", "Chemical Spill in Lab", "In Progress", "Mar 28, 2025", "Science Lab", "<button class='action-btn' onclick='showIncidentDetails(\"INC-001\", \"Chemical Spill in Lab\")'>View</button>"]
+                ],
+                formFields: [
+                    { label: "Incident Title", type: "text", name: "title", required: true },
+                    { label: "Location", type: "text", name: "location", required: true },
+                    { label: "Description", type: "textarea", name: "description", required: true },
+                    { label: "Severity", type: "select", name: "severity", options: ["Low", "Medium", "High", "Critical"], required: true },
+                    { label: "Date Occurred", type: "date", name: "date", required: true }
+                ],
+                reports: "<p>Available Reports:</p><ul><li>Incident Frequency by Location</li><li>Incident Severity Trends</li><li>Open Incidents by Department</li><li>Average Resolution Time</li></ul>"
+            },
+            maintenance: {
+                title: "Maintenance Requests",
+                description: "Submit and track maintenance requests for your facility",
+                overview: "The Maintenance Requests module helps you manage repair and maintenance needs across your facilities. Track the status of requests and ensure timely resolution.",
+                listHeaders: ["ID", "Title", "Status", "Date", "Location", "Priority", "Actions"],
+                listItems: [
+                    ["MNT-002", "AC Not Working", "In Progress", "Mar 27, 2025", "Office Area", "Medium", "<button class='action-btn'>View</button>"],
+                    ["MNT-001", "Broken Window", "Pending", "Mar 29, 2025", "Classroom 101", "High", "<button class='action-btn'>View</button>"]
+                ],
+                formFields: [
+                    { label: "Request Title", type: "text", name: "title", required: true },
+                    { label: "Location", type: "text", name: "location", required: true },
+                    { label: "Description", type: "textarea", name: "description", required: true },
+                    { label: "Priority", type: "select", name: "priority", options: ["Low", "Medium", "High", "Urgent"], required: true }
+                ],
+                reports: "<p>Available Reports:</p><ul><li>Maintenance Requests by Type</li><li>Average Resolution Time</li><li>Pending Requests by Priority</li><li>Maintenance Costs by Department</li></ul>"
+            },
+            audit: {
+                title: "Audits & Inspections",
+                description: "Schedule and conduct safety audits and inspections",
+                overview: "The Audits & Inspections module allows you to plan, conduct, and track safety audits across your organization. Ensure compliance with safety standards and regulations.",
+                listHeaders: ["ID", "Title", "Status", "Due Date", "Department", "Assigned To", "Actions"],
+                listItems: [
+                    ["AUD-005", "Monthly Fire Safety Inspection", "Scheduled", "Apr 15, 2025", "All Departments", "Safety Team", "<button class='action-btn'>View</button>"],
+                    ["AUD-004", "Quarterly Electrical Safety Audit", "Scheduled", "May 10, 2025", "Maintenance", "John Smith", "<button class='action-btn'>View</button>"],
+                    ["AUD-003", "Annual OSHA Compliance Review", "In Progress", "Apr 30, 2025", "All Departments", "Safety Committee", "<button class='action-btn'>View</button>"]
+                ],
+                formFields: [
+                    { label: "Audit Title", type: "text", name: "title", required: true },
+                    { label: "Department", type: "text", name: "department", required: true },
+                    { label: "Audit Type", type: "select", name: "type", options: ["Safety Inspection", "Compliance Audit", "Risk Assessment", "Other"], required: true },
+                    { label: "Due Date", type: "date", name: "dueDate", required: true },
+                    { label: "Assigned To", type: "text", name: "assignedTo", required: true }
+                ],
+                reports: "<p>Available Reports:</p><ul><li>Audit Completion Rate</li><li>Findings by Department</li><li>Corrective Actions Status</li><li>Compliance Trend Analysis</li></ul>"
+            },
+            document: {
+                title: "Document Repository",
+                description: "Store and manage EHS-related documents",
+                overview: "The Document Repository module provides a central location for all your EHS-related documents, policies, and procedures. Ensure everyone has access to the latest versions.",
+                listHeaders: ["ID", "Title", "Type", "Date", "Uploaded By", "Actions"],
+                listItems: [
+                    ["DOC-002", "Chemical Safety Guidelines", "DOCX", "Feb 10, 2025", "Administrator", "<button class='action-btn'>View</button>"],
+                    ["DOC-001", "Emergency Response Plan", "PDF", "Jan 15, 2025", "Administrator", "<button class='action-btn'>View</button>"]
+                ],
+                formFields: [
+                    { label: "Document Title", type: "text", name: "title", required: true },
+                    { label: "Document Type", type: "select", name: "type", options: ["Policy", "Procedure", "Form", "Report", "Training Material", "Other"], required: true },
+                    { label: "Description", type: "textarea", name: "description", required: false },
+                    { label: "File", type: "file", name: "file", required: true }
+                ],
+                reports: "<p>Available Reports:</p><ul><li>Document Access Statistics</li><li>Document Age Analysis</li><li>Review Status by Document Type</li></ul>"
+            },
+            training: {
+                title: "Training Materials",
+                description: "Access and manage safety training resources",
+                overview: "The Training Materials module helps you organize and deliver safety training across your organization. Track completion and ensure compliance with training requirements.",
+                listHeaders: ["ID", "Title", "Category", "Duration", "Last Updated", "Actions"],
+                listItems: [
+                    ["TRN-003", "Fire Safety Basics", "Emergency Response", "45 min", "Mar 15, 2025", "<button class='action-btn'>View</button>"],
+                    ["TRN-002", "Hazardous Materials Handling", "Chemical Safety", "60 min", "Feb 20, 2025", "<button class='action-btn'>View</button>"],
+                    ["TRN-001", "Ergonomics in the Workplace", "Health & Wellness", "30 min", "Jan 10, 2025", "<button class='action-btn'>View</button>"]
+                ],
+                formFields: [
+                    { label: "Training Title", type: "text", name: "title", required: true },
+                    { label: "Category", type: "select", name: "category", options: ["Emergency Response", "Chemical Safety", "Health & Wellness", "Equipment Safety", "Compliance", "Other"], required: true },
+                    { label: "Duration (minutes)", type: "number", name: "duration", required: true },
+                    { label: "Description", type: "textarea", name: "description", required: true },
+                    { label: "Training Materials", type: "file", name: "materials", required: true }
+                ],
+                reports: "<p>Available Reports:</p><ul><li>Training Completion by Department</li><li>Certification Expiration Alerts</li><li>Training Effectiveness Surveys</li><li>Compliance Status</li></ul>"
+            },
+            housekeeping: {
+                title: "Housekeeping",
+                description: "Manage and track housekeeping tasks and inspections",
+                overview: "The Housekeeping module helps maintain clean and safe work environments. Schedule regular inspections and track completion of housekeeping tasks.",
+                listHeaders: ["ID", "Task", "Area", "Frequency", "Last Completed", "Next Due", "Status", "Actions"],
+                listItems: [
+                    ["HSK-042", "Floor Cleaning", "Main Hallway", "Daily", "Mar 31, 2025", "Apr 1, 2025", "Completed", "<button class='action-btn'>View</button>"],
+                    ["HSK-041", "Waste Removal", "All Areas", "Daily", "Mar 31, 2025", "Apr 1, 2025", "Completed", "<button class='action-btn'>View</button>"],
+                    ["HSK-040", "Equipment Cleaning", "Workshop", "Weekly", "Mar 28, 2025", "Apr 4, 2025", "Scheduled", "<button class='action-btn'>View</button>"]
+                ],
+                formFields: [
+                    { label: "Task Name", type: "text", name: "task", required: true },
+                    { label: "Area", type: "text", name: "area", required: true },
+                    { label: "Frequency", type: "select", name: "frequency", options: ["Daily", "Weekly", "Bi-Weekly", "Monthly", "Quarterly", "As Needed"], required: true },
+                    { label: "Assigned To", type: "text", name: "assignedTo", required: true },
+                    { label: "Description", type: "textarea", name: "description", required: false }
+                ],
+                reports: "<p>Available Reports:</p><ul><li>Task Completion Rate</li><li>Areas Requiring Attention</li><li>Inspection Results Trend</li><li>Resource Utilization</li></ul>"
+            },
+            settings: {
+                title: "Settings",
+                description: "Configure your EHS application settings",
+                overview: "The Settings module allows you to customize the application to meet your organization's specific needs. Manage users, notifications, and system preferences.",
+                listHeaders: ["Setting", "Value", "Last Updated", "Actions"],
+                listItems: [
+                    ["Notifications", "Enabled", "Mar 15, 2025", "<button class='action-btn'>Edit</button>"],
+                    ["Auto Logout", "30 minutes", "Mar 15, 2025", "<button class='action-btn'>Edit</button>"],
+                    ["Theme", "Light", "Mar 15, 2025", "<button class='action-btn'>Edit</button>"]
+                ],
+                formFields: [
+                    { label: "Setting Name", type: "text", name: "name", required: true },
+                    { label: "Value", type: "text", name: "value", required: true },
+                    { label: "Description", type: "textarea", name: "description", required: false }
+                ],
+                reports: "<p>Available Reports:</p><ul><li>System Usage Statistics</li><li>User Activity Log</li><li>Configuration Change History</li></ul>"
+            }
+        };
+
+        // Show dashboard content
+        function showDashboard() {
+            document.getElementById('dashboardContent').style.display = 'block';
+            document.getElementById('moduleContent').style.display = 'none';
+            
+            // Update active navigation link
+            const navLinks = document.querySelectorAll('.sidebar nav a');
+            navLinks.forEach(link => link.classList.remove('active'));
+            navLinks[0].classList.add('active');
+        }
+
+        // Show module content
+        function showModule(moduleId) {
+            if (!moduleData[moduleId]) {
+                alert('Module not found!');
+                return;
+            }
+            
+            const module = moduleData[moduleId];
+            
+            // Update module title and description
+            document.getElementById('moduleTitle').textContent = module.title;
+            document.getElementById('moduleDescription').textContent = module.description;
+            
+            // Update overview content
+            document.getElementById('moduleOverviewContent').innerHTML = module.overview;
+            
+            // Update list view
+            const listTableHead = document.getElementById('listTableHead');
+            let headerHTML = '<tr>';
+            module.listHeaders.forEach(header => {
+                headerHTML += `<th>${header}</th>`;
+            });
+            headerHTML += '</tr>';
+            listTableHead.innerHTML = headerHTML;
+            
+            const listTableBody = document.getElementById('listTableBody');
+            let rowsHTML = '';
+            module.listItems.forEach(item => {
+                rowsHTML += '<tr>';
+                item.forEach(cell => {
+                    rowsHTML += `<td>${cell}</td>`;
+                });
+                rowsHTML += '</tr>';
+            });
+            listTableBody.innerHTML = rowsHTML;
+            
+            // Update form fields
+            const newItemForm = document.getElementById('newItemForm');
+            let formHTML = '';
+            module.formFields.forEach(field => {
+                formHTML += `<div class="form-group">`;
+                formHTML += `<label for="${field.name}">${field.label}${field.required ? ' *' : ''}</label>`;
+                
+                if (field.type === 'textarea') {
+                    formHTML += `<textarea name="${field.name}" id="${field.name}"${field.required ? ' required' : ''}></textarea>`;
+                } else if (field.type === 'select') {
+                    formHTML += `<select name="${field.name}" id="${field.name}"${field.required ? ' required' : ''}>`;
+                    formHTML += `<option value="">-- Select ${field.label} --</option>`;
+                    field.options.forEach(option => {
+                        formHTML += `<option value="${option}">${option}</option>`;
+                    });
+                    formHTML += `</select>`;
+                } else {
+                    formHTML += `<input type="${field.type}" name="${field.name}" id="${field.name}"${field.required ? ' required' : ''}>`;
+                }
+                
+                formHTML += `</div>`;
+            });
+            
+            // Add submit and reset buttons
+            formHTML += `<div class="form-group">
+                <button type="button" onclick="submitForm('${moduleId}')">Submit</button>
+                <button type="button" onclick="resetForm()">Reset</button>
+            </div>`;
+            
+            newItemForm.innerHTML = formHTML;
+            
+            // Update reports content
+            document.getElementById('reportsContent').innerHTML = module.reports;
+            
+            // Show module content, hide dashboard
+            document.getElementById('dashboardContent').style.display = 'none';
+            document.getElementById('moduleContent').style.display = 'block';
+            
+            // Reset to overview tab
+            showTab('overview');
+            
+            // Update active navigation link
+            const navLinks = document.querySelectorAll('.sidebar nav a');
+            navLinks.forEach(link => link.classList.remove('active'));
+            
+            // Find the link for this module
+            for (let i = 0; i < navLinks.length; i++) {
+                if (navLinks[i].textContent.toLowerCase().includes(module.title.toLowerCase())) {
+                    navLinks[i].classList.add('active');
+                    break;
+                }
+            }
+        }
+
+        // Show tab content
+        function showTab(tabId) {
+            // Hide all tab content
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(tab => tab.classList.remove('active'));
+            
+            // Show selected tab content
+            document.getElementById(tabId + 'Tab').classList.add('active');
+            
+            // Update active tab button
+            const tabButtons = document.querySelectorAll('.tab-button');
+            tabButtons.forEach(button => button.classList.remove('active'));
+            
+            // Find the button for this tab
+            for (let i = 0; i < tabButtons.length; i++) {
+                if (tabButtons[i].textContent.toLowerCase().includes(tabId)) {
+                    tabButtons[i].classList.add('active');
+                    break;
+                }
+            }
+        }
+
+        // Show incident details modal
+        function showIncidentDetails(id, title) {
+            document.getElementById('incidentId').textContent = id;
+            document.getElementById('incidentTitle').textContent = title;
+            document.getElementById('incidentModalTitle').textContent = 'Incident Details: ' + title;
+            
+            // Show the modal
+            document.getElementById('incidentModal').style.display = 'flex';
+        }
+
+        // Show logout confirmation modal
+        function showLogoutConfirmation() {
+            document.getElementById('logoutModal').style.display = 'flex';
+        }
+
+        // Close modal
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        // Update incident status
+        function updateIncidentStatus() {
+            const currentStatus = document.getElementById('incidentStatus').textContent;
+            let newStatus;
+            
+            if (currentStatus === 'In Progress') {
+                newStatus = 'Resolved';
+            } else if (currentStatus === 'Critical') {
+                newStatus = 'In Progress';
+            } else if (currentStatus === 'Resolved') {
+                newStatus = 'Closed';
+            } else {
+                newStatus = 'In Progress';
+            }
+            
+            document.getElementById('incidentStatus').textContent = newStatus;
+            alert('Status updated to: ' + newStatus);
+        }
+
+        // Submit form
+        function submitForm(moduleId) {
+            alert('Form submitted successfully!');
+            resetForm();
+            showTab('list');
+        }
+
+        // Reset form
+        function resetForm() {
+            document.getElementById('newItemForm').reset();
+        }
+
+        // Logout function
+        function logout() {
+            alert('You have been logged out successfully.');
+            closeModal('logoutModal');
+            // In a real app, this would redirect to login page
+        }
+
+        // Initialize the dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            showDashboard();
+        });
     </script>
 </body>
 </html>
