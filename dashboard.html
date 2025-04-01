@@ -257,6 +257,20 @@
         .action-btn:hover {
             background-color: #004d00;
         }
+        
+        /* Feature coming soon message */
+        .coming-soon-message {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            z-index: 1000;
+        }
     </style>
 </head>
 <body>
@@ -265,17 +279,17 @@
         <h1>EHS App</h1>
         <nav>
             <a href="#" class="active"><i class="icon dashboard-icon"></i> Dashboard</a>
-            <a href="incident-reporting.html"><i class="icon incident-icon"></i> Incident Reporting</a>
-            <a href="maintenance-requests.html"><i class="icon maintenance-icon"></i> Maintenance Requests</a>
-            <a href="audits-inspections.html"><i class="icon audit-icon"></i> Audits & Inspections</a>
-            <a href="document-repository.html"><i class="icon document-icon"></i> Document Repository</a>
-            <a href="training-materials.html"><i class="icon training-icon"></i> Training Materials</a>
-            <a href="housekeeping.html"><i class="icon housekeeping-icon"></i> Housekeeping</a>
-            <a href="settings.html"><i class="icon settings-icon"></i> Settings</a>
+            <a href="#" onclick="showFeatureMessage('Incident Reporting'); return false;"><i class="icon incident-icon"></i> Incident Reporting</a>
+            <a href="#" onclick="showFeatureMessage('Maintenance Requests'); return false;"><i class="icon maintenance-icon"></i> Maintenance Requests</a>
+            <a href="#" onclick="showFeatureMessage('Audits & Inspections'); return false;"><i class="icon audit-icon"></i> Audits & Inspections</a>
+            <a href="#" onclick="showFeatureMessage('Document Repository'); return false;"><i class="icon document-icon"></i> Document Repository</a>
+            <a href="#" onclick="showFeatureMessage('Training Materials'); return false;"><i class="icon training-icon"></i> Training Materials</a>
+            <a href="#" onclick="showFeatureMessage('Housekeeping'); return false;"><i class="icon housekeeping-icon"></i> Housekeeping</a>
+            <a href="#" onclick="showFeatureMessage('Settings'); return false;"><i class="icon settings-icon"></i> Settings</a>
         </nav>
         <div class="user-info">
             <span id="userInfo">Administrator</span>
-            <button id="logoutBtn" onclick="logout()">Logout</button>
+            <button id="logoutBtn" onclick="showFeatureMessage('Logout')">Logout</button>
         </div>
     </div>
 
@@ -288,7 +302,7 @@
 
         <!-- Dashboard Statistics -->
         <div class="statistics-container">
-            <div class="stat-card">
+            <div class="stat-card" onclick="showFeatureMessage('Incident Reporting')">
                 <div class="icon-container incident-icon">
                     <i class="icon large"></i>
                 </div>
@@ -299,7 +313,7 @@
                 </div>
             </div>
             
-            <div class="stat-card">
+            <div class="stat-card" onclick="showFeatureMessage('Maintenance Requests')">
                 <div class="icon-container maintenance-icon">
                     <i class="icon large"></i>
                 </div>
@@ -310,7 +324,7 @@
                 </div>
             </div>
             
-            <div class="stat-card">
+            <div class="stat-card" onclick="showFeatureMessage('Audits & Inspections')">
                 <div class="icon-container audit-icon">
                     <i class="icon large"></i>
                 </div>
@@ -321,7 +335,7 @@
                 </div>
             </div>
             
-            <div class="stat-card">
+            <div class="stat-card" onclick="showFeatureMessage('Housekeeping')">
                 <div class="icon-container housekeeping-icon">
                     <i class="icon large"></i>
                 </div>
@@ -352,118 +366,47 @@
                         <td>Electrical Outage</td>
                         <td><span class="status critical">Critical</span></td>
                         <td>Mar 30, 2025</td>
-                        <td><button class="action-btn" data-action="view-details" data-id="INC-003">View</button></td>
+                        <td><button class="action-btn" onclick="showFeatureMessage('Incident Details')">View</button></td>
                     </tr>
                     <tr>
                         <td>INC-002</td>
                         <td>Slip and Fall in Hallway</td>
                         <td><span class="status resolved">Resolved</span></td>
                         <td>Mar 25, 2025</td>
-                        <td><button class="action-btn" data-action="view-details" data-id="INC-002">View</button></td>
+                        <td><button class="action-btn" onclick="showFeatureMessage('Incident Details')">View</button></td>
                     </tr>
                     <tr>
                         <td>INC-001</td>
                         <td>Chemical Spill in Lab</td>
                         <td><span class="status in-progress">In Progress</span></td>
                         <td>Mar 28, 2025</td>
-                        <td><button class="action-btn" data-action="view-details" data-id="INC-001">View</button></td>
+                        <td><button class="action-btn" onclick="showFeatureMessage('Incident Details')">View</button></td>
                     </tr>
                 </tbody>
             </table>
         </div>
     </div>
 
-    <!-- Authentication Fix and Dashboard Statistics Functionality -->
+    <!-- Feature Message -->
+    <div id="featureMessage" class="coming-soon-message">
+        <p>The <span id="featureName"></span> feature is coming soon!</p>
+    </div>
+
+    <!-- Simple JavaScript - No Authentication or External Dependencies -->
     <script>
-    // Create a mock user session to prevent redirect to login page
-    if (!localStorage.getItem('currentUser')) {
-        const demoUser = {
-            username: 'admin',
-            role: 'admin',
-            name: 'Administrator'
-        };
-        localStorage.setItem('currentUser', JSON.stringify(demoUser));
-    }
-    
-    // Basic logout function
-    function logout() {
-        localStorage.removeItem('currentUser');
-        window.location.href = 'login.html';
-    }
-    
-    /** 
-     * EHS App Dashboard Statistics Fix
-     * 
-     * This script adds click functionality to the dashboard statistics cards
-     * in the SafetySync EHS application. It makes the statistics cards interactive
-     * by adding click event handlers, cursor styling, and hover effects.
-     */
-    
-    // Function to make dashboard statistics cards interactive
-    function makeDashboardStatisticsClickable() {
-        // Get all statistics cards on the dashboard
-        const statCards = document.querySelectorAll('.stat-card');
-        console.log('Making', statCards.length, 'dashboard statistics cards clickable');
+    // Show feature message
+    function showFeatureMessage(featureName) {
+        const message = document.getElementById('featureMessage');
+        const featureNameElement = document.getElementById('featureName');
         
-        // Add click event listeners to each statistics card
-        statCards.forEach((card) => {
-            // Get the text content of this statistics card
-            const cardText = card.textContent.toLowerCase();
-            
-            // Add the click event listener
-            card.addEventListener('click', function(e) {
-                // Prevent default behavior that might trigger authentication checks
-                e.preventDefault();
-                
-                // Determine which section to navigate to based on the card content
-                if (cardText.includes('incident')) {
-                    console.log('Navigating to Incident Reporting section');
-                    window.location.href = 'incident-reporting.html';
-                } 
-                else if (cardText.includes('maintenance')) {
-                    console.log('Navigating to Maintenance Requests section');
-                    window.location.href = 'maintenance-requests.html';
-                }
-                else if (cardText.includes('audit')) {
-                    console.log('Navigating to Audits & Inspections section');
-                    window.location.href = 'audits-inspections.html';
-                }
-                else if (cardText.includes('housekeeping')) {
-                    console.log('Navigating to Housekeeping section');
-                    window.location.href = 'housekeeping.html';
-                }
-                else {
-                    console.log('Unknown card type, no navigation target');
-                    alert('This feature is coming soon!');
-                }
-            });
-        });
+        featureNameElement.textContent = featureName;
+        message.style.display = 'block';
         
-        // Handle action buttons
-        const actionButtons = document.querySelectorAll('.action-btn');
-        actionButtons.forEach(button => {
-            button.addEventListener('click', function(e) {
-                // Prevent default behavior that might trigger authentication checks
-                e.preventDefault();
-                
-                const action = this.getAttribute('data-action');
-                const id = this.getAttribute('data-id');
-                
-                if (action === 'view-details') {
-                    alert('Viewing details for ' + id);
-                }
-            });
-        });
+        setTimeout(function() {
+            message.style.display = 'none';
+        }, 2000);
         
-        console.log('Dashboard statistics cards are now clickable with visual feedback');
-    }
-    
-    // Call the function when the DOM is fully loaded
-    document.addEventListener('DOMContentLoaded', makeDashboardStatisticsClickable);
-    
-    // If the page is already loaded, run the function immediately
-    if (document.readyState === 'complete' || document.readyState === 'interactive') {
-        makeDashboardStatisticsClickable();
+        return false;
     }
     </script>
 </body>
